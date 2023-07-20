@@ -1690,7 +1690,19 @@ right outer join
 dept d
 on e.dept_id = d.dep_id;
 
+--full outer join
+--it is the combination of both left and right oter join.
+--if the columns are not matchinfg then null values will be there.
+select *
+from employee e
+full outer join
+dept d
+on e.dept_id = d.dep_id;
 
+
+--PROJECT 1 
+
+select * from credit_card_transactions;
 
 
 
