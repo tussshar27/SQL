@@ -1704,5 +1704,38 @@ on e.dept_id = d.dep_id;
 
 select * from credit_card_transactions;
 
+--1- write a query to print top 5 cities with highest spends and their percentage contribution of total credit card spends 
+select city, sum(amount) amt
+from credit_card_transactions
+group by city
+order by amt desc;
+
+--2- write a query to print highest spend month and amount spent in that month for each card type
+with A1 as
+(
+select card_type, extract(year from transaction_date) as year, extract(month from transaction_date) as month, sum(amount)as sum_amount
+from credit_card_transactions
+group by card_type, extract(year from transaction_date), extract(month from transaction_date)
+)
+, B1 as
+(
+select card_type, month, sum_amount, dense_rank() over(partition by card_type order by sum_amount desc) as rank
+from A1
+)
+select *
+from B1
+where rank = 1;
+
+--3- write a query to print the transaction details(all columns from the table) for each card type when
+--it reaches a cumulative of 1000000 total spends(We should have 4 rows in the o/p one for each card type)
+select card_type, max(sum) from (
+select s.*, sum(s.amount) over(partition by card_type order by s.amount asc) as sum
+from credit_card_transactions s) group by card_type;
+
+
+
+
+
+
 
 
