@@ -475,13 +475,18 @@ select dept_id, avg(salary) average_sal
 from employee
 group by dept_id;
 
---LISTAGG aggregate function used to aggregate string
+--LISTAGG aggregate function used to aggregate string i.e to aggregate all the rows of same group to a single row.
+select dept_id, EMP_NAME, salary --in Microsoft SQL, its STRING_AGG
+from employee
+order by dept_id;
+
+--please refer above code output with below code output to understand it.
 select dept_id, LISTAGG(EMP_NAME,'|') as list_of_emp      --in Microsoft SQL, its STRING_AGG
 from employee
 group by dept_id
 order by dept_id;
 
-select dept_id, LISTAGG(EMP_NAME,'|') within group (order by salary) as list_of_emp      --in Microsoft SQL, its STRING_AGG
+select dept_id, LISTAGG(EMP_NAME,'|') within group (order by salary) as list_of_emp      --as the name within group suggests, it will sort the values within group.
 from employee
 group by dept_id;
 
@@ -501,13 +506,14 @@ where extract(year from order_date) = 2020;
 --datediff(day,order_date,sip_date) in MS SQL
 
 
---CASE statement
+--CASE - WHEN - END statement
 --BETWEEN clause includes the boundaries
 --case statement is a dynamic column
 --in SQL, we dont have if-else so we use case-when
 --case statement follows top to bottom approach
 --thats why a number which is less than 100 is not consider in <250 and <400
-
+--NOTE: ELSE statement is must in CASE statement, otherwise it will delete all the rows which are not mentioned in case statement.
+--it should always end with END statement or else it ill throw error.
 select order_id, profit,
 case                        --dynamic column
 when profit < 100 then 'low profit'
@@ -528,7 +534,8 @@ end as profit_category
 from orders;
 
 
---UPDATE QUERY USING CASE STATEMENT
+--UPDATE QUERY USING CASE - WHEN STATEMENT
+--NOTE: there is no use of "end as" statement in UPDATE statement
 update orders 
 set amount=case when item='Keyboard' then 1000 
 				when item='Mouse' then 500 
@@ -549,18 +556,18 @@ customer_name,
 trim('    tushar    '),
 reverse(customer_name),
 replace(order_id,'CA-','TA'),
-translate(order_id,'CA','sN'),  --one to one mapping
+translate(order_id,'CA','sN'),  --one to one character mapping
 length(customer_name),
 --left(customer_name,4)             --oracle does'nt have left fncton like MSSQL have.
 --right(customer_name,4)       ,      --oracle does'nt have right fncton like MSSQL have.
-substr(customer_name,2) text ,
-substr(customer_name,2,4) left_name ,
-substr(customer_name,-6) right_name  ,   --to take it from end
+substr(customer_name,2) text ,      --it starts with 1
+substr(customer_name,2,4) text2 ,
+substr(customer_name,-6) text3  ,   --it will count from end and goes till end
 substr(customer_name,3,6),
-instr(customer_name,' ') as char_index,
+instr(customer_name,' ') as char_index,     --it will give position of first occurance
 instr(customer_name,'C') as char_index,      --it will give position of first occurance
 concat(concat(order_id,'-'),customer_name),
-order_id||'-'||customer_name,            --same as above
+order_id||'-'||customer_name,            --double bar, same as above
 substr(customer_name,1,instr(customer_name,' ')),    --it will print till where first space is occuring
 substr(customer_name,1,instr(customer_name,'e'))    --it will print till where first r is occuring
 --replace(col,'AT','TA'),
@@ -578,9 +585,8 @@ select order_id, city,
 nvl(city,'unknown'),      --in MSSQL its ISNULL
 state,region,
 coalesce(city,'unknown'),      --in COALESCE function, we can pass more than one argument
-coalesce(city,state,region,'unknown') ,     --in COALESCE function, we can pass more than one argument
-coalesce(city,state,region),      --in COALESCE function, we can pass more than one argument
---if city is null then state value, if state is null then region value, if region is also null then passing string argument
+coalesce(city,state,region,'unknown') ,    --if city is null then state value, if state is null then region value, if region is also null then passing string argument
+coalesce(city,state,region),      
 nvl(sales,1),
 --nvl(sales,'AB')   ---error
 coalesce(sales,1)
@@ -588,17 +594,18 @@ coalesce(sales,1)
 from orders
 where city is null;
 
-
+--CAST & ROUND function
 select order_id,sales, 
-cast(sales as int),   --converting float to int in query.
-round(sales,'1')    --round to one integer after decimal.
+cast(sales as int),   --converting float to int in query. --it also do round to the value
+round(sales),        --round to zero integer after decimal. --same as above
+round(sales,'1')     --round to one integer after decimal.
 from orders
 fetch first 5 rows only;
 
 
 --set queries
---dfference between JOIN and UNION or other set operators are Join will combile column of tables where as set operator will combine two or more tables
--- join combine columns from two tables; whereas, set operations combine rows from two tables.
+--difference between JOIN and UNION or other set operators are Join will combine column of tables where as set operator will combine two or more tables
+-- join combine columns from two tables; whereas, set operations will have same no. of columns of a single table but combined rows from two tables.
 
 create table orders_west
 (
@@ -618,12 +625,14 @@ insert into orders_west values(2,'west',200);
 insert into orders_west values(3,'east',300);
 insert into orders_east values(3,'east',300);
 insert into orders_east values(4,'east',300);
+insert into orders_east values(7,'east',200);
+insert into orders_east values(5,'east',500);
 commit;
 --DELETE FROM orders_west WHERE region = 'east';
 
 select * from orders_west;
 select * from orders_east;
---whle performing union all, make sure that the number of columns and the dataype should be same for both the table should be same.
+--whle performing union all, make sure that the number of columns and the dataype should be same for both the tables.
 
 
 
@@ -718,7 +727,7 @@ select * from orders_vw;
 alter table dept 
 add constraint primary_key primary key (dep_id);
 
---to apply foreign key constraint, the col must be primary key first.
+--NOTE: to apply foreign key constraint, the col must be primary key first.
 create table emp
 (
 emp_id int,
@@ -736,7 +745,7 @@ select * from dept;
 
 create table dept1
 (
-id int generated always as identity,    --autosubstituted and auuto incremented
+id int generated always as identity,    --autosubstituted and auto incremented
 dep_id int,
 dep_name varchar2(10)
 );
@@ -860,32 +869,32 @@ with A1 as
 select customer_id, count(distinct order_id) as total_count from orders group by customer_id
 )
 select * from A1 where total_count > (select avg(total_count) from A1);
+----------------------------------------------------------------------------------------------
 
-
---Window Functions (over())
---when we use * in select query, we should assign alias or else it will give error
+-- WINDOW Functions (over())
+--when we use * in select query, we should assign alias or else it will give error in oracle
 select * from employee; 
 
 select * from employee
 order by dept_id, salary desc; -- it will do first dept_id asc and salary desc
 
---Q rank from highest salary
---while row_number(), compulsorly we have to use order by
+--Q. rank from highest salary
+--in row_number() or rank() or dense_rank(), compulsory we have to use order by
 select e.*,
 row_number() over(order by salary desc) as rn
 from employee e;
 
---creating windowv of dept_id
+--creating window of dept_id
 select
 e.*,
 row_number() over( partition by dept_id order by salary desc) as rn
 from employee e;
 
---if there are duplicates
+--if there are duplicates   , since row_number gives unique number to each row whether its duplicate or not.
 select
 e.*,
-row_number() over( partition by dept_id order by salary desc, emp_id asc) as rn
-from employee e;
+row_number() over( partition by dept_id order by salary desc, emp_id asc) as rn     -- it is useful in rank(), dense_rank()
+from employee e;                        --in order by, execution is from left to right
 
 
 --Q. print top 2 ranks of each department
@@ -958,6 +967,7 @@ where rank <= 5;
 
 
 --LEAD and LAG windows function
+--it will print next value for lead and previous value for lag.
 --it needs one or two parameters
 select e.*,
 lead(salary,1) over(order by salary) as lead_sal  
@@ -988,7 +998,7 @@ select e.*,
 lag(salary,1) over(order by salary) as lag_sal
 from employee e;
 
---we can use lag instead of lead and generate the same reullt or vice-versa
+--we can use lag instead of lead and generate the same reult or vice-versa
 -- Q. To get salary of person higher to your current salary
 select e.*,
 lead(salary,1) over(order by salary asc) as lead_sal
@@ -1010,7 +1020,7 @@ from employee e;
 
 select e.*,
 first_value(salary) over(order by salary desc) as first_sal,
-last_value(salary) over(order by salary desc) as last_sal          -- it will consider unbounded preceeding and current value
+last_value(salary) over(order by salary desc) as last_sal   --it will print same value       -- it will consider unbounded preceeding and current value
 from employee e;
 
 
@@ -1162,7 +1172,7 @@ on s.phone_number = e.phone_number and s.rn = e.rn;     --acting as a primary ke
 
 --AGGREGATION using WINDOWS function
 
---Q. to print avg salary for each department
+--Q. to print avg salary for each department, it should print all rows of table with avg value.
 with A1 as
 (
 select dept_id, avg(salary) as avg_salary
@@ -1191,7 +1201,8 @@ from employee e;
 
 --if we mention ORDER BY in aggregate function then it will do RUNNING operation
 select e.*,
-sum(salary) over(partition by dept_id) as sum_salary    --working as a subquery
+sum(salary) over(partition by dept_id) as sum_salary
+,avg(salary) over(partition by dept_id) as avg_salary    
 ,sum(salary) over(partition by dept_id order by emp_age) as sum_sal_orderby --running sum : current value gets add up with next value in sum().
 ,sum(salary) over(order by emp_age) as sum_sal_orderby
 from employee e;
@@ -1230,10 +1241,10 @@ select e.*
 from employee e;
 
 
---practise
+--practice
 select e.emp_id, e.emp_age,e.dept_id, e.salary
 ,sum(salary) over(partition by dept_id) as sum_partitionby  --sum of all in that particular partition
-,sum(salary) over(order by emp_age) as sum_orderby      -- running sum = one previous value of sum(salary) + current value of salary like a triangle
+,sum(salary) over(order by emp_age) as sum_orderby      -- running sum = one previous value of sum(salary) + current value of salary, like a triangle
 ,sum(salary) over(partition by dept_id order by emp_age) as sum_partition_order
 ,sum(salary) over(order by emp_age rows between 2 preceding and current row) as preceding_currentrow -- running sum, --2 preceding of salary will addup to current salary value.
 ,sum(salary) over(order by emp_age rows between 1 preceding and 1 following) as preceding_following -- running sum, --1 preceding will addup to current row and 1 following values.
@@ -1253,7 +1264,6 @@ select * from employee;
 select e.*
 ,first_value(salary) over(order by salary) as first_sal_value
 ,first_value(salary) over(order by salary desc) as last_sal_value   --working as a last_value
-
 --below query will consider from unbounded preceding to current row, therefore it tqkes curret row as last row and display the same value
 ,last_value(salary) over(order by salary) as last_sal_value   --working as a last_value
 ,last_value(salary) over(order by salary rows between current row and unbounded following) as last_sal_value   --working as a last_value    --15000
@@ -1416,7 +1426,73 @@ PRINT :K
 --many database don't have pivot in it.
 select * from orders;
 
---Q. to get the sales of each category n 2020 and 2021
+--Q. to get the sales of each category in 2020 and 2021
+--aggregate fucntion using case statament
+select o.category
+,sum(case when extract(year from o.order_date)=2020 then o.sales end) sales_in_2020
+,sum(case when extract(year from o.order_date)=2021 then o.sales end) sales_in_2021
+from orders o
+group by o.category;
+
+select * from
+(
+select o.category, extract(year from o.order_date) as year, o.sales
+from orders o
+) A1
+pivot
+(
+sum(sales)      --alias should not be mentioned, else it will throw error.
+for year in (2020,2021)
+)B1;
+
+
+
+
+
+--Q. To find max sales of each category in each region for year 2020,2021
+select o.category, o.region
+, max(case when extract(year from o.order_date)=2020 then o.sales end) max_2020
+, max(case when extract(year from o.order_date)=2021 then o.sales end) max_2021
+from orders o
+group by o.category, o.region;
+
+--same code is done using pivot
+--PIVOT will automatically group the columns which we want.
+select * from
+(
+select category, region, extract(year from order_date) year, sales    --clean columns
+from orders
+)A1
+pivot(
+sum(sales)
+for year in (2020,2021)     -- for - in statement in pivot.
+)B1;
+
+
+--Q. to find sum of sales for each category for region south and east.
+select category, sum(sales)
+from orders
+where region in ('South','East')
+group by category;
+
+select category
+,sum(case when region='South' then sales end) sum1
+,sum(case when region='East' then sales end) sum2
+from orders
+group by category;
+
+select * from
+(
+select category, region, sales
+from orders
+)A1
+pivot
+(
+sum(sales)
+for region in ('South','East')
+)B1;
+
+
 select o.category
 ,sum(case when extract(year from o.order_date)=2020 then o.sales end) as sales_2020
 ,sum(case when extract(year from o.order_date)=2021 then o.sales end) as sales_2021
@@ -1438,7 +1514,7 @@ for yod in (2020,2021)  --whatever you give here, that many number of columns ar
 --same as above query
 select * from
 (
-select o.category, region, o.sales
+select o.category, o.region, o.sales
 from orders o
 ) t1
 pivot 
@@ -1719,21 +1795,68 @@ group by card_type, extract(year from transaction_date), extract(month from tran
 )
 , B1 as
 (
-select card_type, month, sum_amount, dense_rank() over(partition by card_type order by sum_amount desc) as rank
-from A1
+select a.*, dense_rank() over(partition by a.card_type order by a.sum_amount desc) as rank
+from A1 a
 )
-select *
+select * 
 from B1
 where rank = 1;
 
 --3- write a query to print the transaction details(all columns from the table) for each card type when
 --it reaches a cumulative of 1000000 total spends(We should have 4 rows in the o/p one for each card type)
+select * from credit_card_transactions;
+
 select card_type, max(sum) from (
 select s.*, sum(s.amount) over(partition by card_type order by s.amount asc) as sum
 from credit_card_transactions s) group by card_type;
 
 
+--4- write a query to find city which had lowest percentage spend for gold card type
+select city, sum(amount) sm
+from credit_card_transactions
+where card_type='Gold'
+group by city
+order by sm;
 
+with A1 as
+(
+select city, sum(amount) as sum_amt
+from credit_card_transactions
+where card_type='Gold'
+group by city
+)
+, B1 as
+(
+select a.*, dense_rank() over(order by a.sum_amt) rnk
+from A1 a
+)
+select * from B1 where rnk=1;
+
+--5- write a query to print 3 columns:  city, highest_expense_type , lowest_expense_type (example format : Delhi , bills, Fuel)
+with I1 as
+(
+select city,exp_type, sum(amount) am
+from credit_card_transactions
+group by city,exp_type
+)
+, A1 as
+(
+select city,max(am) max1,min(am) min1
+from I1
+group by city
+)
+select i.city
+,case when i.am=a.max1 then i.exp_type end as highest
+,case when i.am=a.min1 then i.exp_type end as lowest
+from I1 i
+inner join A1 a
+on (i.city=a.city);
+ 
+ 
+ 
+--6- write a query to find percentage contribution of spends by females for each expense type
+
+select * from credit_card_transactions;
 
 
 
