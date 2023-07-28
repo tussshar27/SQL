@@ -1798,7 +1798,7 @@ group by card_type, extract(year from transaction_date), extract(month from tran
 select a.*, dense_rank() over(partition by a.card_type order by a.sum_amount desc) as rank
 from A1 a
 )
-select * 
+select *
 from B1
 where rank = 1;
 

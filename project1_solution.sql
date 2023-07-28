@@ -62,6 +62,113 @@ from A1 a
 select * from B1 where rnk = 1;
 
 
+--3- write a query to print the transaction details(all columns from the table) for each card type when
+--it reaches a cumulative of 1,000,000 total spends(We should have 4 rows in the o/p one for each card type)
+
+select * from credit_card_transactions;
+
+with A1 as
+(
+select c.*, sum(c.amount) over(partition by c.card_type order by c.transaction_date,c.transaction_id) amount_spend
+from credit_card_transactions c
+)
+, B1 as
+(
+select a.* 
+from A1 a 
+where a.amount_spend > 1000000
+)
+select * from (
+select b.*, rank() over(partition by card_type order by b.amount_spend) rnk
+from B1 b
+)
+where rnk=1;
+
+--4- write a query to find city which had lowest percentage spend for gold card type
+
+with A1 as
+(
+select city, card_type, sum(amount) amount_spend
+from credit_card_transactions
+group by city, card_type
+having card_type='Gold'
+)
+, B1 as
+(
+select sum(amount) total_amount
+from credit_card_transactions
+group by card_type 
+having card_type='Gold'
+)
+select * from (
+select a.*,b.*, round((a.amount_spend/b.total_amount)*100,6) percentage_spend
+from A1 a, B1 b
+order by a.amount_spend
+)
+where rownum=1;
+
+--5- write a query to print 3 columns:  city, highest_expense_type , lowest_expense_type (example format : Delhi , bills, Fuel)
+with A1 as
+(
+select city, exp_type, sum(amount) amount_spend
+from credit_card_transactions
+group by city, exp_type
+)
+, B1 as
+(
+select a.*
+, rank() over(partition by a.city order by a.amount_spend) asc_rnk
+, rank() over(partition by a.city order by a.amount_spend desc) desc_rnk
+from A1 a
+)
+select c.city
+, max(case when asc_rnk=1 then exp_type end) as lowest_expense_type     --bydefault it will give else values as null
+, max(case when desc_rnk=1 then exp_type end) as highest_expense_type   --bydefault it will give else values as null
+from
+(
+select b.*
+from B1 b
+where asc_rnk=1 or desc_rnk=1
+) c
+group by c.city
+;
+
+--6- write a query to find percentage contribution of spends by females for each expense type
+with A1 as
+(
+select exp_type, gender, sum(amount) amount_spend
+from credit_card_transactions
+group by exp_type, gender
+having gender='F'
+)
+, B1 as
+(
+select exp_type, sum(amount) total_amount
+from credit_card_transactions
+group by exp_type
+)
+select a.*, b.total_amount,round((a.amount_spend/b.total_amount)*100,4) as percentage_contribution
+from A1 a
+inner join B1 b
+on (a.exp_type=b.exp_type);
+
+
+--7- which card and expense type combination saw highest month over month growth in Jan-2014
+select * from (
+select card_type, exp_type, extract(year from transaction_date) year, extract(month from transaction_date) month, sum(amount) total_amount
+from credit_card_transactions
+group by card_type, exp_type, extract(year from transaction_date), extract(month from transaction_date)
+)
+where year=2014 and month=1
+order by card_type;
+
+
+
+
+
+
+
+
 
 
 
