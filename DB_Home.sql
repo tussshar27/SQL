@@ -141,7 +141,7 @@ where profit > 50
 group by sub_category
 having sum(sales) > 10000
 order by total_sales desc
-fetch  first 10 rows only;
+fetch first 10 rows only;
 
 --order of execution-> from, where, group by, having, select, order by
 --WHERE condition is used with nonaggregated column only
@@ -157,7 +157,7 @@ where profit > 50
 group by SHIP_MODE,CATEGORY, SUB_CATEGORY
 having CATEGORY = 'Furniture'   --we can put any column in having clause not just aggregated function.
 order by SHIP_MODE desc
-fetch  first 10 rows only;
+fetch first 10 rows only;
 --HAVING can be used with aggregated or non aggregated columns
 
 select sub_category, sum(sales) as total_sales
@@ -166,7 +166,7 @@ where profit > 50
 group by sub_category
 having sum(sales) > 10000
 order by total_sales desc
-fetch  first 10 rows only;
+fetch first 10 rows only;
 
 --all aggregate functions won't cont null values.
 --only count(*) will take all values including null.
@@ -560,7 +560,7 @@ translate(order_id,'CA','sN'),  --one to one character mapping
 length(customer_name),
 --left(customer_name,4)             --oracle does'nt have left fncton like MSSQL have.
 --right(customer_name,4)       ,      --oracle does'nt have right fncton like MSSQL have.
-substr(customer_name,2) text ,      --it starts with 1
+substr(customer_name,2) text ,      --index starts with 1
 substr(customer_name,2,4) text2 ,
 substr(customer_name,-6) text3  ,   --it will count from end and goes till end
 substr(customer_name,3,6),

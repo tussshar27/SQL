@@ -153,23 +153,79 @@ inner join B1 b
 on (a.exp_type=b.exp_type);
 
 
---7- which card and expense type combination saw highest month over month growth in Jan-2014
-select * from (
+--7- which card and expense type combination saw highest month over month percent growth in Jan-2014
+with A1 as
+(
 select card_type, exp_type, extract(year from transaction_date) year, extract(month from transaction_date) month, sum(amount) total_amount
 from credit_card_transactions
 group by card_type, exp_type, extract(year from transaction_date), extract(month from transaction_date)
 )
-where year=2014 and month=1
-order by card_type;
+, B1 as
+(
+select a.*, lag(a.total_amount,1) over(partition by a.card_type, a.exp_type order by a.year, a.month) prev_month_spend
+from A1 a
+)
+select b.*, round((b.total_amount-b.prev_month_spend)/b.prev_month_spend,4) as month_on_month_growth
+from B1 b
+where b.year=2014 and b.month=1
+order by (b.total_amount-b.prev_month_spend)/b.prev_month_spend desc
+fetch first 1 row only;
+
+
+--8- during weekends which city has highest total spend to total no of transcations ratio 
+select b.*, (b.total_spend/b.total_transaction) ratio from (
+select city, count(transaction_date) total_transaction, sum(amount) total_spend
+from credit_card_transactions
+where to_char(to_date(transaction_date,'DD-MM-YYYY'),'D') in (1,7)
+group by city
+) b
+order by ratio desc
+fetch first 1 row only;
+
+
+--select to_char(date '1998-03-27','DAY') from dual;
+
+--9- which city took least number of days to reach its 500th transaction after the first transaction in that city
+select e.*, (e.target_trans-e.first_trans) trans from (
+select city, min(transaction_date) first_trans, max(transaction_date) target_trans from
+(
+select d.*
+from (
+select c.*, row_number() over(partition by c.city order by c.transaction_date, c.transaction_id) rn
+from credit_card_transactions c
+) d
+where d.rn=1 or d.rn=500
+)
+group by city
+having count(*)=2
+) e
+order by trans
+fetch first 1 row only
+;
+
+--above query written using CTE
+with A1 as
+(
+select c.*, row_number() over(partition by c.city order by c.transaction_date, c.transaction_id) rn
+from credit_card_transactions c
+)
+, B1 as
+(
+select * from A1 
+where rn=1 or rn=500
+)
+, C1 as
+(
+select city, min(transaction_date) first_trans, max(transaction_date) target_trans 
+from B1
+group by city
+having count(*)=2
+)
+select c.*, (c.target_trans-c.first_trans) trans from C1 c
+order by trans
+fetch first 1 row only
+;
 
 
 
-
-
-
-
-
-
-
-
-
+--SOLVE QUESTIONS OF ASSIGNMENT, DATALEMUR AND ANKIT BANSAL'S SQL 50 QUESTIONS PLAYLIST TO CRACK ANY COMPANY INTERVIEW WHETHER THAT BE MICROSOFT, GOOGLE, AMAZON, ETC.
