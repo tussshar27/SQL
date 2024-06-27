@@ -865,7 +865,7 @@ select A1.dept_id, A1.max_sal ,B1.emp_name from A1 inner join B1 on A1.dept_id =
 --3- write a query to find employees whose age is more than average age of all the employees.
 select * from employee where emp_age > (select avg(emp_age) from  employee);
 
-`
+
 --2- write a query to find employees whose salary is more than average salary of employees in their department
 with A1 as
 (
