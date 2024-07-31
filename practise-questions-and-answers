@@ -73,4 +73,13 @@ group by id
 )
 where intime > outtime or outtime is null;
 
-10. 
+10. return all employees whose salary is same in each department.
+with A1 as (
+select dept_id,salary
+from employee
+group by dept_id, salary
+having count(1) > 1
+)
+select e.* from A1 a inner join employee e on a.id = e.id and a.salary = e.salary;
+
+
