@@ -23,6 +23,7 @@ from employee e1
 ) where rnk = 2;
 
 4. Find customers who are not present in the orders table.
+Answer:
 SELECT first_name, age
 FROM Customers c
 left join orders o
@@ -30,6 +31,7 @@ on c.customer_id = o.customer_id
 where o.customer_id is null;
 
 5. find the change in employee status from 2020 to 2021 -> Example of full outer join.
+Answer:
 SELECT e20.*, e21.*,
 CASE
 WHEN e20.designation IS DISTINCT FROM e21.designation THEN 'Promoted'
@@ -40,4 +42,18 @@ FROM emp_2020 e20
 FULL OUTER JOIN emp_2021 e21 ON e20.emp_id = e21.emp_id
 WHERE COALESCE(e20.designation,'XXX') != COALESCE(e21.designation,'YYY');
 
-6. 
+6. Rank the duplicate records.
+Answer:
+
+7. Identify and delete exact duplicate record.
+Answer:
+create table employee2 as select * from employee where 1 = 2;
+insert into employee2 (
+select * from (
+select *, row_number() over(partition by id order by salary) rn from employee
+) where rn = 1
+);
+
+8. 
+
+
