@@ -54,6 +54,12 @@ select *, row_number() over(partition by id order by salary) rn from employee
 ) where rn = 1
 );
 
-8. 
+8. Find no of goldmedal per swimmer for swimmers who only won gold medals.
+select id, count(medal) as no_of_gold 
+from athletes 
+where game = "swimming" and medal = "gold"
+group by id
+order by no_of_gold desc;
 
+9. 
 
