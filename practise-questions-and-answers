@@ -61,5 +61,16 @@ where game = "swimming" and medal = "gold"
 group by id
 order by no_of_gold desc;
 
-9. 
+9. find the total no of people present inside the hospital
+Answer:
+select * from
+(
+select id,
+max(case when action = 'in' then time end) as intime,
+max(case when action = 'out' then time end) as outitme
+from hospital
+group by id
+)
+where intime > outtime or outtime is null;
 
+10. 
