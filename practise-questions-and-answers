@@ -1,1 +1,25 @@
-practise-question
+1. Employees Earning More Than Their Managers.
+Answer:
+select e1.name as Employee
+from employee e1
+inner join employee e2
+on e1.managerid = e2.id
+where e1.salary > e2.salary;
+
+2. Second Highest Salary, if there is no value then print null.
+Answer:
+select max(salary) as SecondHighestSalary
+from (
+select e1.*, dense_rank() over(order by e1.salary desc) as rnk
+from employee e1
+) where rnk = 2;
+
+3. Find the employee with second highest salary from each department, if there is no value then print null.
+Answer:
+select max(salary) as SecondHighestSalary
+from (
+select e1.*, dense_rank() over(partition by id order by e1.salary desc) as rnk
+from employee e1
+) where rnk = 2;
+
+4. 
