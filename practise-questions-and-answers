@@ -30,4 +30,14 @@ on c.customer_id = o.customer_id
 where o.customer_id is null;
 
 5. find the change in employee status from 2020 to 2021 -> Example of full outer join.
+SELECT e20.*, e21.*,
+CASE
+WHEN e20.designation IS DISTINCT FROM e21.designation THEN 'Promoted'
+WHEN e21.designation IS NULL THEN 'Resigned'
+ELSE 'New'
+END AS comment
+FROM emp_2020 e20
+FULL OUTER JOIN emp_2021 e21 ON e20.emp_id = e21.emp_id
+WHERE COALESCE(e20.designation,'XXX') != COALESCE(e21.designation,'YYY');
 
+6. 
