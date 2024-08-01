@@ -82,4 +82,20 @@ having count(1) > 1
 )
 select e.* from A1 a inner join employee e on a.id = e.id and a.salary = e.salary;
 
+11. write the query to find the highest and lowest salary employee in each department.
+Answer:
+with A1 as (
+select d.d_name, e.e_name, rank() over(partition by d.d_name order by e.salary) rnk_asc, rank() over(partition by d.d_name order by e.salary desc) rnk_desc
+from employee e
+inner join
+department d
+on e.dept_id = d.dept_id
+)
+select d_name, e_name
+from A1
+where rnk_asc = 1 and rnk_desc = 1
+;
+
+12. 
+
 
