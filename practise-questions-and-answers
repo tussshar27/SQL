@@ -126,7 +126,9 @@ where rnk = 1
 group by order_date
 ;
 
-14. 
+14. find the father's name and mother's name of every child.
+Answer:
+
 
 
 
