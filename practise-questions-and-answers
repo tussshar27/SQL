@@ -84,9 +84,6 @@ select e.* from A1 a inner join employee e on a.id = e.id and a.salary = e.salar
 
 11. write the query to find the highest and lowest salary employee in each department.
 Answer:
-#depart_name, max_sal_emp_name, min_sal_emp_name
-
-
 with A1 as (
 select d_name, e_name
 dense_rank() over(partition by d_name order by salary desc) as max_rnk,
@@ -102,6 +99,44 @@ from A1
 group by d_name
 ;
 
-12. 
+12. find the names which are not common in both source and target table.
+Answer:
+select coalesce(s.id,t.id) as id,
+case when t.id is null then 'new in source'
+when s.id is null then 'new in target' 
+--else 'mismatched' 
+end as comment
+from source s
+full outer join
+target t
+on s.id = t.id
+where s.id is null or t.id is null or s.id != t.id
+;
+
+13. find the count of new customer in each month.
+Answer:
+select order_date, count(distinct c_id) as count
+from
+(
+select *,
+rank() over(partition by c_id order by order_date) as rnk
+from customers
+)
+where rnk = 1 
+group by order_date
+;
+
+14. 
+
+
+
+
+
+
+
+
+
+
+
 
 
