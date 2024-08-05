@@ -67,11 +67,11 @@ SELECT * FROM orders;
 
 
 -- Constraints
---1. not null
+--1. default constraint
 --2. check constraint, it is used to restrict data to specific values while inserting.
---3. unique constraint,
---4. default constraint
---5. prmary key is the combination of not null + unique
+--3. unique constraint
+--4. not null constraint
+--5. primary key constraint, it is the combination of unique + not null.
 
 drop table e_orders;
 create table e_orders(
