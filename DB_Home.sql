@@ -457,6 +457,7 @@ on e.dept_id = d.dep_id
 where dep_name is null;
 
 select * from employee;
+--Question2
 --find the manager names of all the employees
 --consider self join as operation between two identical tables
 --if we have to make a jon between two columns of a single table then virtually we have to consider two identical tables and make a join.
@@ -467,6 +468,8 @@ from employee e1
 inner join employee e2 
 on e1.manager_id = e2.emp_id;
 
+--Question3
+--find manager whose salary is lesser than its employee
 select e1.emp_id as emp_id, e2.emp_id as manager_id, e2.emp_name as manager_name
 from employee e1
 inner join employee e2 
