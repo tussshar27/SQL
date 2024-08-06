@@ -748,13 +748,15 @@ select * from orders_vw;
 alter table dept 
 add constraint primary_key primary key (dep_id);
 
---NOTE: to apply foreign key constraint, the col must be primary key first.
+--Foreign Key
+--NOTE: to apply foreign key constraint, the column of other table must be primary key first.
 create table emp
 (
 emp_id int,
 name varchar2(10),
 dep_id int not null references dept(dep_id)     --foreign key constraint
 );
+
 --since above table is dependent on dept table, therefore we cant update or delete dep_id record which is dependent in emp table
 insert into emp values (1,'aman',100);
 insert into emp values (2,'tushar',200);
@@ -796,14 +798,14 @@ select * from orders where order_id = 'US-2019-134026';
 
 select * from dept;
 
---with subquery
+-- subquery
 select e.*,(select avg(salary) as avg_sal from employee) from employee e
 where dept_id not in (select dep_id from dept);
 NOTE: for NOT IN, If the inner query has any NULL value then it will give zero records. so to rectify this use below query.
 select e.*,(select avg(salary) as avg_sal from employee) from employee e
 where dept_id not in (select dep_id from dept where dep_id is not null);
 
---with left join
+-- left join
 select *
 from employee e 
 left join dept d
@@ -836,8 +838,21 @@ group by team_name;
 
 --day 9 exercise
 --NOTE: Apart from columns of a particlar table from WITH clause, nothing will come in select query. we can call other tables too.
---6- write a query to print product id and total sales of highest selling products (by no of units sold) in each category
+
+--Question6 
+--write a query to print product id and total sales of highest selling products (by no of units sold) in each category
 select distinct category from orders;
+
+select product_id, total_sales from (
+select *, dense_rank() over(partition by category_name order by total_sales) as rnk from (
+select c.category_name, o.product_id, sum(o.quantity) as total_sales
+from orders o
+inner join category c
+on o.order_id = c.order_id
+group by c.category_name, o.product_id
+)
+)where rnk = 1
+;
 
 --we have frst created query to get the total sales quantity of each product, now next we will find the max quantity of sales done for product.
 with A1 as
@@ -859,7 +874,6 @@ where salary = (select max(salary) from employee);
 
 
 --4- write a query to print emp name, salary and dep id of highest salaried employee in each department 
-
 with A1 as (
 select dept_id,max(salary) as max_sal from employee
 group by dept_id
