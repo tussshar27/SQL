@@ -519,7 +519,7 @@ where extract(year from order_date) = 2020;
 --datediff(day,order_date,sip_date) in MS SQL
 
 
---CASE - WHEN - END statement
+--CASE - WHEN - ELSE - END statement
 --BETWEEN clause includes the boundaries
 --case statement is a dynamic column
 --in SQL, we dont have if-else so we use case-when
@@ -548,7 +548,6 @@ from orders;
 
 
 --UPDATE QUERY USING CASE - WHEN STATEMENT
---NOTE: there is no use of "end as" statement in UPDATE statement
 update orders 
 set amount=case when item='Keyboard' then 1000 
 				when item='Mouse' then 500 
@@ -556,13 +555,16 @@ set amount=case when item='Keyboard' then 1000
                 else amount end;
                 
                 
-                
+-- add column to existing table   
 alter table employee
 add dob date;
 
 
 --String Function
 select * from orders;
+
+SELECT SUBSTR('Oracle Substring', -16, 6) AS Substring FROM dual;
+-- Result: "Oracle"
 
 select order_id, 
 customer_name,
@@ -575,7 +577,7 @@ length(customer_name),
 --right(customer_name,4)       ,      --oracle does'nt have right fncton like MSSQL have.
 substr(customer_name,2) text ,      --index starts with 1
 substr(customer_name,2,4) text2 ,
-substr(customer_name,-6) text3  ,   --it will count from end and goes till end
+substr(customer_name,-6) text3  ,   --it will count from end and goes till start
 substr(customer_name,3,6),
 instr(customer_name,' ') as char_index,     --it will give position of first occurance
 instr(customer_name,'C') as char_index,      --it will give position of first occurance
@@ -593,7 +595,7 @@ substr(customer_name,1,instr(customer_name,'e'))    --it will print till where f
 --substr(col,1,instr(col,' ')
 from orders;
 
---NVL replaces null values with argument
+--NVL has 2 parameters and it replaces null values with argument
 select order_id, city, 
 nvl(city,'unknown'),      --in MSSQL its ISNULL
 state,region,
@@ -607,6 +609,10 @@ coalesce(sales,1)
 from orders
 where city is null;
 
+--NVL2 has 3 parameters and if the 1st parameter value is NULL then exp1 otherwise exp2.
+select NVL2(NULL, 1, 2) from dual; --returns 2 because the first argument is null.
+select NVL2(1, 'ABC', 'XYZ') from dual; --returns ‘ABC’ because the first argument is not null.
+
 --CAST & ROUND function
 select order_id,sales, 
 cast(sales as int),   --converting float to int in query. --it also do round to the value
@@ -618,7 +624,7 @@ fetch first 5 rows only;
 
 --set queries
 --difference between JOIN and UNION or other set operators are Join will combine column of tables where as set operator will combine two or more tables
--- join combine columns from two tables; whereas, set operations will have same no. of columns of a single table but combined rows from two tables.
+-- join combine columns from two tables; whereas, union (set operations) will have same no. of columns of a single table but combined rows from two tables.
 
 create table orders_west
 (
@@ -650,15 +656,15 @@ select * from orders_east;
 
 
 --only union all will give u everything, intersect, minus, union will remove duplicates
-select * from orders_west   --4rows, remove duplicates
+select * from orders_west   --4rows, without duplicates
 union
 select * from orders_east;
 
-select * from orders_west   --5rows, all rows with and without duplicates
+select * from orders_west   --5rows, all rows including duplicates
 union all
 select * from orders_east;
 
-select distinct * from orders_west   --5rows, all rows with and without duplicates
+select distinct * from orders_west   --5rows, all rows including duplicates
 union all
 select distinct * from orders_east;
 
@@ -667,9 +673,12 @@ intersect
 select * from orders_east;
 
 select * from orders_west   --orders_west - orders_east
-except      --except = minus
+except      --same as minus
 select * from orders_east;
 
+select * from orders_west   --orders_west - orders_east
+minus      --same as except
+select * from orders_east;
 
 --day 7 exercise
 
@@ -705,7 +714,6 @@ end_time date,
 start_loc varchar2(10), 
 end_loc varchar2(10)
 );
-drop table drivers;
 
 --display only time portion of date-time value by altering session
 alter session set NLS_DATE_FORMAT = 'HH24:MI:SS';
@@ -728,7 +736,7 @@ on d1.id = d2.id and d1.end_time=d2.start_time and d1.end_loc = d2.start_loc;
 group by id;
 
 
--- join combine columns from separate tables; whereas, set operations combine rows from separate tables.
+-- join combine columns from separate tables; whereas, union operations combine rows from separate tables.
 --union all example
 
 --VIEW
@@ -747,7 +755,7 @@ emp_id int,
 name varchar2(10),
 dep_id int not null references dept(dep_id)     --foreign key constraint
 );
---since above table is dependent on dept table, therefore we cant update or delete dep_id record who is dependent iin emp table
+--since above table is dependent on dept table, therefore we cant update or delete dep_id record which is dependent in emp table
 insert into emp values (1,'aman',100);
 insert into emp values (2,'tushar',200);
 --insert into emp values (1,'aman',500);  --ERROR, since its foreign key and 50 is not present in dept table.
