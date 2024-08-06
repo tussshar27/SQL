@@ -309,7 +309,7 @@ full outer join dept d on e.dept_id = d.dep_id;
 --join of more than two tables
 select * 
 from employee e
-left join dept d on e.dept_id = d.dep_id    --order of execution:first left join -> inner join
+left join dept d on e.dept_id = d.dep_id    --order of execution:left join -> inner join
 inner join people p on p.region = e.region;     --we can join people table with any one of previous tables.
 --we can join n number of tables together.
 
