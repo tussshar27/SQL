@@ -270,7 +270,7 @@ inner join dept d on e.dept_id = d.dep_id;
 
 
 --left join
---give all the records from left table and if the data from right table does not match with left table then put null in that column.
+--give all the records from left table and if the data from right table does not match with left table then it will put null in that column.
 
 SELECT * FROM employee;
 SELECT * FROM dept;
