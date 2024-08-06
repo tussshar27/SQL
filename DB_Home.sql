@@ -794,6 +794,9 @@ select * from dept;
 --with subquery
 select e.*,(select avg(salary) as avg_sal from employee) from employee e
 where dept_id not in (select dep_id from dept);
+NOTE: for NOT IN, If the inner query has any NULL value then it will give zero records. so to rectify this use below query.
+select e.*,(select avg(salary) as avg_sal from employee) from employee e
+where dept_id not in (select dep_id from dept where dep_id is not null);
 
 --with left join
 select *
