@@ -387,20 +387,14 @@ inner join dept d
 on e.dept_id = d.dep_id
 group by d.dep_name;
 
---TEST
+--Question1
 --write a query to print dep names where none of the emplyees have same salary.
-select d.dep_name,e.salary --,count(rownum)
+select d.dep_name
 from employee e 
 inner join dept d
 on e.dept_id = d.dep_id
-group by d.dep_name,e.salary
-having count(rownum) = 1
-;
-select d.dep_name
-from employee e
-inner join dept d on e.dept_id=d.dep_id
-group by d.dep_name
-having count(e.emp_id)=count(distinct e.salary)
+group by dep_name
+having count(salary) != count(distinct salary)
 ;
 
 --TEST
