@@ -1,3 +1,16 @@
 stored-procedure in azure synapse
 Steps:
-1. Create a lined service for Azure SQL Database.
+1. First Create a stored procedure inside MS SQL.
+2. Create a linked service for "Azure SQL Database" in azure.
+3. create a pipeline inside azure synapse analytics:
+a. import Get Metadata activity, working: it will go to the folder inside ADLS and return the childitem of file name and type of file inside it.
+b. import "For Each" Activity: get the details from "get metadata" activity in loop- of iteration for each file.
+c. connect get metadata acitivity to for each activity via success connector.
+d. click on Edit of "For Each" activity and inside that import "get metadata" activity to return more details from each file.
+e. select dataset or create one related to ADLS.
+f. import "stored procedure" activity inside it.
+g. connect both "get metadata" and "stored procedure" activity with success connector.
+h. 
+e. In stored procedure > settings > select your created linked service that we just created.
+f. Select our stored procedure name form MS SQL.
+g. 
