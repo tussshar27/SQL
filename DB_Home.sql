@@ -846,8 +846,8 @@ group by team_name;
 select distinct category from orders;
 
 select product_id, total_sales from (
-select *, dense_rank() over(partition by category_name order by total_sales) as rnk from (
-select c.category_name, o.product_id, sum(o.quantity) as total_sales
+select *, dense_rank() over(partition by category_name order by no_of_sales) as rnk from (
+select c.category_name, o.product_id, count(o.sales) no_of_sales, sum(o.quantity) as total_sales
 from orders o
 inner join category c
 on o.order_id = c.order_id
