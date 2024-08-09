@@ -489,11 +489,13 @@ from employee
 group by dept_id;
 
 --LISTAGG aggregate function used to aggregate string i.e to aggregate all the rows of same group to a single row.
+-- without LISTAGG
 select dept_id, EMP_NAME, salary --in Microsoft SQL, its STRING_AGG
 from employee
 order by dept_id;
 
 --please refer above code output with below code output to understand it.
+--with LISTAGG
 select dept_id, LISTAGG(EMP_NAME,'|') as list_of_emp      --in Microsoft SQL, its STRING_AGG
 from employee
 group by dept_id
