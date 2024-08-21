@@ -121,9 +121,9 @@ from
 select *,
 rank() over(partition by c_id order by order_date) as rnk
 from customers
-)
-where rnk = 1 
+) 
 group by order_date
+having max(rnk)=1
 ;
 
 14. find the father's name and mother's name of every child.
