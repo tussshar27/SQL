@@ -146,8 +146,8 @@ region
 from orders group by region order by count desc;
 --we can only use nonaggregate columns with group by
 
-select count(*),count(order_id), count(distinct order_id) from orders;--we cant pass more than one column inside count function, but it can achieved by using subquery.
-
+select count(*), count(order_id), count(distinct order_id) from orders;--we can't pass more than one column inside count function, but it can achieved by using subquery.
+select count(*), count(order_id), approx_count_distinct(order_id) from orders;--approx_count_distinct() function is more efficient than count(distinct column) function.
 SELECT region FROM orders group by region;  -- group by can be worked as distinct keyword.
 
 --GROUP BY
