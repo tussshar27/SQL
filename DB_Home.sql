@@ -116,7 +116,13 @@ add discount number(20);
 
 --filters
 --where clause
-SELECT o.*, sysdate, current_date,CURRENT_TIMESTAMP FROM e_orders o;    --sysdate to get current date
+SELECT o.*, sysdate, current_date,CURRENT_TIMESTAMP FROM e_orders o;    --sysdate to get current date and time, if NLS setting is set to only date then it will date.
+
+SELECT TRUNC(SYSDATE) AS current_date FROM DUAL; --to get only date.
+
+--MS SQL date
+SELECT GETDATE(); -- to get date and time
+select cast(getdate() as date); --to get only date
 
 SELECT * FROM e_orders where prod_name > 'mask';    -- filter is done based on ASCII value of each characters
 
