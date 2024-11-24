@@ -819,10 +819,8 @@ from orders
 group by order_id
 having sum(sales) >
 (
-select avg(total_sales) from
-(select order_id, sum(sales) as total_sales 
+select avg(sales) from
 from orders
-group by order_id)
 );
 
 select * from orders where order_id = 'US-2019-134026';
