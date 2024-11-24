@@ -648,7 +648,7 @@ select NVL2(1, 'ABC', 'XYZ') from dual; --returns ‘ABC’ because the first ar
 select order_id,sales, 
 cast(sales as int),   --converting float to int in query. --it also do round to the value
 round(sales),        --round to zero integer after decimal. --same as above
-round(sales,'1')     --round to one integer after decimal.
+round(sales,1) --round to one integer after decimal.
 from orders
 fetch first 5 rows only;
 
