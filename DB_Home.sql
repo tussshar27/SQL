@@ -37,6 +37,8 @@ insert into employees values (4,'Noor',9867556324);
 delete from employees;
 --Update statement
 
+--Delete statement 
+
 --DQL > data querying language, if ur not changing any data or table then its DQL
 SELECT e.*,rowid,rownum FROM employees e where rownum < 2;  --rowid is unique row id for each row, rownum is the series vise number to each row.
 -- top, limit is used in other databases.
