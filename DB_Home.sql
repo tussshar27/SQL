@@ -574,6 +574,7 @@ from orders;
 
 
 --UPDATE QUERY USING CASE - WHEN STATEMENT
+-- case when is used in update statement when there are multiple where conditions to call with respective values.
 update orders 
 set amount=case when item='Keyboard' then 1000 
 				when item='Mouse' then 500 
