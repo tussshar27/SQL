@@ -418,7 +418,7 @@ from employee e
 inner join dept d
 on e.dept_id = d.dep_id
 group by dep_name
-having count(salary) != count(distinct salary)
+having count(salary) == count(distinct salary)
 ;
 
 --TEST
