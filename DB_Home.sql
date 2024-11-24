@@ -636,6 +636,9 @@ coalesce(sales,1)
 from orders
 where city is null;
 
+SELECT SUM(COALESCE(salary, 0)) AS total_salary
+FROM employees; --treats null values as 0 during the summation.
+
 --NVL2 has 3 parameters and if the 1st parameter value is NULL then exp1 otherwise exp2.
 select NVL2(NULL, 1, 2) from dual; --returns 2 because the first argument is null.
 select NVL2(1, 'ABC', 'XYZ') from dual; --returns ‘ABC’ because the first argument is not null.
