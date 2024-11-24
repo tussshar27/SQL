@@ -142,7 +142,7 @@ SELECT * FROM orders where customer_name like 'S%%' escape '%';     --consider %
 --we don't use = with null because it is a unknown value. thats why we use is special keyword.
 --'' -> empty string
 --,,(two commas) -> null means unknown
-select * from orders;
+select * from orders where orderid is null;
 
 update orders 
 set city = null --we are not comparng it, setting it thats why we use =.
