@@ -41,7 +41,16 @@ delete from employees;
 
 --DQL > data querying language, if ur not changing any data or table then its DQL
 SELECT e.*,rowid,rownum FROM employees e where rownum < 2;  --rowid is unique row id for each row, rownum is the series vise number to each row.
--- top, limit is used in other databases.
+
+-- top, limit is used in other databases eg, MSSQL.
+SELECT TOP (5) * 
+FROM Employees 
+ORDER BY Salary DESC;
+
+SELECT * 
+FROM Employees 
+ORDER BY Salary DESC
+limit 10;
 
 rename employee to employees;   --renaming table
 
