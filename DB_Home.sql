@@ -1618,6 +1618,43 @@ alter table employee add dept_name varchar2(20);
 --dept d
 --on e.dept_id = d.dep_id;
 
+--Merge
+
+MERGE INTO target_employees AS target
+USING source_employees AS source
+ON target.employee_id = source.employee_id
+
+-- Update operation
+WHEN MATCHED THEN
+    UPDATE SET 
+        target.name = source.name,
+        target.salary = source.salary,
+        target.department_id = source.department_id
+
+-- Insert operation
+WHEN NOT MATCHED BY TARGET THEN
+    INSERT (employee_id, name, salary, department_id)
+    VALUES (source.employee_id, source.name, source.salary, source.department_id)
+
+-- Delete operation
+WHEN NOT MATCHED BY SOURCE THEN
+    DELETE;
+
+Explanation of above Operations:
+
+1. UPDATE: For matching rows (employee_id exists in both tables):
+
+Bob's salary is updated from 60000 to 65000.
+
+Charlie's data remains unchanged as the values are identical.
+
+2. INSERT: For rows in the source table that do not exist in the target table:
+
+Diana (employee_id 4) is inserted into the target table.
+
+3. DELETE: For rows in the target table that do not exist in the source table:
+
+Emma (employee_id 5) is deleted because she is not in the source table.
 merge into employee e
 using dept d
 on (e.dept_id = d.dep_id)
