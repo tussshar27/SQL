@@ -1,3 +1,5 @@
+-- SQL Order of Execution: From > where > group by > having > select > distinct > order by > limit
+
 --schema is like a folder where as database is like a drive eg. C drive in windows. we can create multiple schemas in a single database.
 
 -- regexp in oracle:
