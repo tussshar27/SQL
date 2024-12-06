@@ -1,4 +1,40 @@
+-- to change password of database
+--// For seeing full user details
+SELECT * FROM dba_users WHERE username = 'SYSTEM';
+SELECT profile FROM dba_users WHERE username = 'SYSTEM';
+
+--// This query is used to change the password life time to unlimited
+ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME UNLIMITED; 
+
+--// This query is used to change the default password.
+alter user your_username identified by your_password;
+
+--// we can also change password using cmd
+--1. open cmd
+--2. type: sqlplus / as sysdba
+--3. alter user your_username identified by your_password;
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+
 --schema is like a folder where as database is like a drive eg. C drive in windows. we can create multiple schemas in a single database.
+select * from dba_pdbs; -- to show all the pluggable dbs
+select * from dba_users;    -- to show all the users
+select * from all_tables;
+
+use db_home;
+
+SELECT name AS username FROM sys.sysusers;	--all the users in sql server
+
+SELECT TABLE_SCHEMA, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';
+
+select * from INFORMATION_SCHEMA.TABLES;	--to get all the tables inside the db.
+
+select * from sys.tables;
+
+SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'vehicle';	--table properties
+
+SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'vehicle';	--table column properties
 
 
 --DDL > Data Defnition Language
@@ -18,19 +54,22 @@ insert into employees values (1,'Tushar',8419997411);
 insert into employees values (2,'Aman',9867525253);
 insert into employees values (3,'Ajay',8965742278);
 insert into employees values (4,'Noor',9867556324);
-delete from employees;
+--delete from employees;
 --Update statement
 
 --DQL > data querying language, if ur not changing any data or table then its DQL
+
+-- rowid, rownum
 SELECT e.*,rowid,rownum FROM employees e where rownum < 2;  --rowid is unique row id for each row, rownum is the series vise number to each row.
 -- top, limit is used in other databases.
 
 rename employee to employees;   --renaming table
 
-SELECT * FROM employees order by emp_name desc, emp_id desc;-- for each column we have to specify asc or desc. it will give first preference to first column.
+SELECT * FROM employees order by emp_name desc, emp_id desc;-- for each column we have to specify asc or desc, by default its asc. it will give preference from left to right column.
 
 SELECT * FROM employees;
 
+-- adding new a column
 alter table employees 
 add joining_date date default '27-03-2023' not null;
 
@@ -50,12 +89,12 @@ SELECT * FROM orders;
 
 
 
--- Constraints
+-- Constraints, there are 5 types:
 --1. not null
---2. check constraint, it is used to restrict data to specific values while inserting.
+--2. check constraint, like a where clause, it is used to restrict data to specific values while inserting.
 --3. unique constraint,
 --4. default constraint
---5. prmary key is the combination of not null + unique
+--5. primary key, it is the combination of not null + unique
 
 drop table e_orders;
 create table e_orders(
@@ -63,10 +102,10 @@ order_id integer not null ,--removing unique bc composite primary key is used be
 o_date date,
 prod_name varchar2(10),
 total decimal(6,2),
-payment_method varchar2(20) check (payment_method in ('UPI','Credit Card')),
+payment_method varchar2(20) check (payment_method in ('UPI','Credit Card')),    --check constraint
 discount number(2) check (discount < 20),
-category varchar2(10) default 'Mens Wear',
-primary key (order_id,prod_name)
+category varchar2(10) default 'Mens Wear',      -- default constraint
+primary key (order_id,prod_name)    -- primary composite key constraint
 );
 
 SELECT * FROM e_orders;
@@ -89,7 +128,7 @@ add discount number(20);
 
 --filters
 --where clause
-SELECT o.*, sysdate, current_date,CURRENT_TIMESTAMP FROM e_orders o;    --sysdate to get current date
+SELECT o.*, sysdate, current_date, CURRENT_TIMESTAMP FROM e_orders o;    --sysdate to get current date
 
 SELECT * FROM e_orders where prod_name > 'mask';    -- filter is done based on ASCII value of each characters
 
@@ -100,13 +139,15 @@ SELECT * FROM orders;
 SELECT * FROM orders;
 SELECT * FROM orders where customer_name like '%Gut%';
 SELECT * FROM orders where upper(customer_name) like '%GUT%';
-SELECT * FROM orders where customer_name like '_l%';        -- starts with one character
-SELECT * FROM orders where customer_name like '__l%';       -- starts with two characters
+SELECT * FROM orders where customer_name like '_l%';        -- starts after one character
+SELECT * FROM orders where customer_name like '__l%';       -- starts after two characters
+SELECT * FROM orders where customer_name like '____l%';       -- starts after four characters
 SELECT * FROM orders where customer_name like 'S%%' escape '%';     --consider % as a character of a string
 
 
 --NULL filter
---we don't use = with null because it is a unknown value. thats why we use is special keyword.
+--we don't use = with null because it is a unknown value. thats why we use is a special keyword.
+-- NOTE: we don't give space below because space is also a string.
 --'' -> empty string
 --,,(two commas) -> null means unknown
 select * from orders;
@@ -142,6 +183,17 @@ group by sub_category
 having sum(sales) > 10000
 order by total_sales desc
 fetch first 10 rows only;
+--NOTE: in order to use rownum in above query, we have to make it a subquery otherwise it will throw error of rownum not used in group by.
+
+select * from (
+select sub_category, sum(sales) as total_sales
+from orders
+where profit > 50
+group by sub_category
+having sum(sales) > 10000
+order by total_sales desc
+) where rownum < 11;
+
 
 --order of execution-> from, where, group by, having, select, order by
 --WHERE condition is used with nonaggregated column only
@@ -168,12 +220,12 @@ having sum(sales) > 10000
 order by total_sales desc
 fetch first 10 rows only;
 
---all aggregate functions won't cont null values.
+--all aggregate functions won't count null values.
 --only count(*) will take all values including null.
 SELECT * FROM orders;
-SELECT count(city) FROM orders;--9991
-SELECT count(*) FROM orders;-9994
-SELECT count(*) FROM orders where city is not null;--9991
+SELECT count(city) FROM orders;--9989
+SELECT count(*), count(city), count(distinct city) FROM orders;-9994
+SELECT count(*) FROM orders where city is not null;--9989
 
 select * from orders;
 
@@ -201,6 +253,8 @@ subject varchar(20),
 marks int
 );
 
+
+--insert multiple statements
 insert all
 into exams values (1,'Chemistry',91)
 into exams values (1,'Physics',91)
@@ -254,14 +308,12 @@ inner join dept d on e.dept_id = d.dep_id;
 
 
 --left join
---give all the records from left table and if the data from right table does not match with left table then put null in that column.
+--give all the records from left table and if the data from left table does not match with right table then put null in that column.
 
 SELECT * FROM employee;
 SELECT * FROM dept;
 
---if you join two tables without giving any condition then it will be cross join
-
-
+--if you join two tables without giving any condition then it will be a cross join
 select * 
 from eployee, dept;     -- cross join example
 
@@ -281,13 +333,13 @@ from dept d
 right outer join employee e on e.dept_id = d.dep_id;
 
 --both the above joins will give same output.
---on condition order does not matter
+--'on' condition order does not matter
 
 
 
---full outer join
+--full outer join (combination of left + right joins output)
 select * 
-from eployee e
+from employee e
 full outer join dept d on e.dept_id = d.dep_id;
 
 --join of more than two tables
@@ -319,8 +371,9 @@ insert into employee values(7,'Sanjay',200,9000,2,13);
 insert into employee values(8,'Ashish',200,5000,2,12);
 insert into employee values(9,'Mukesh',300,6000,6,51);
 insert into employee values(10,'Rakesh',500,7000,6,50);
+insert into employee(emp_id,emp_name,dept_id,salary,manager_id,emp_age) values(11,'Aman',100,10000,2,45);
 select * from employee;
-
+commit;
 create table dept(
     dep_id int,
     dep_name varchar(20)
@@ -446,6 +499,7 @@ left join dept d
 on e.dept_id = d.dep_id
 where dep_name is null;
 
+--self join
 select * from employee;
 --find the manager names of all the employees
 --consider self join as operation between two identical tables
@@ -455,7 +509,7 @@ select * from employee;
 select e1.emp_id as emp_id, e2.emp_id as manager_id, e2.emp_name as manager_name
 from employee e1
 inner join employee e2 
-on e1.manager_id = e2.emp_id;
+on e1.manager_id = e2.emp_id;   -- we have taken manager_id of e1 bc we want output based on employees data.
 
 select e1.emp_id as emp_id, e2.emp_id as manager_id, e2.emp_name as manager_name
 from employee e1
@@ -476,12 +530,12 @@ from employee
 group by dept_id;
 
 --LISTAGG aggregate function used to aggregate string i.e to aggregate all the rows of same group to a single row.
-select dept_id, EMP_NAME, salary --in Microsoft SQL, its STRING_AGG
+select dept_id, EMP_NAME, salary 
 from employee
 order by dept_id;
 
 --please refer above code output with below code output to understand it.
-select dept_id, LISTAGG(EMP_NAME,'|') as list_of_emp      --in Microsoft SQL, its STRING_AGG
+select dept_id, LISTAGG(EMP_NAME,'|') as list_of_emp      --in Microsoft SQL server, its STRING_AGG
 from employee
 group by dept_id
 order by dept_id;
@@ -506,14 +560,14 @@ where extract(year from order_date) = 2020;
 --datediff(day,order_date,sip_date) in MS SQL
 
 
---CASE - WHEN - END statement
+--CASE - When, Then - ELSE - END statement
 --BETWEEN clause includes the boundaries
---case statement is a dynamic column
+--case statement is a dynamic column means having user-defined value.
 --in SQL, we dont have if-else so we use case-when
 --case statement follows top to bottom approach
---thats why a number which is less than 100 is not consider in <250 and <400
+--thats why a number which is less than 100 is not considered in <250 and <400
 --NOTE: ELSE statement is must in CASE statement, otherwise it will delete all the rows which are not mentioned in case statement.
---it should always end with END statement or else it ill throw error.
+--it should always end with END statement or else it will throw error.
 select order_id, profit,
 case                        --dynamic column
 when profit < 100 then 'low profit'
@@ -537,9 +591,9 @@ from orders;
 --UPDATE QUERY USING CASE - WHEN STATEMENT
 --NOTE: there is no use of "end as" statement in UPDATE statement
 update orders 
-set amount=case when item='Keyboard' then 1000 
-				when item='Mouse' then 500 
-                when item='Monitor' then 5000 
+set amount = case when item = 'Keyboard' then 1000 
+				when item = 'Mouse' then 500 
+                when item = 'Monitor' then 5000 
                 else amount end;
                 
                 
@@ -562,11 +616,11 @@ length(customer_name),
 --right(customer_name,4)       ,      --oracle does'nt have right fncton like MSSQL have.
 substr(customer_name,2) text ,      --index starts with 1
 substr(customer_name,2,4) text2 ,
-substr(customer_name,-6) text3  ,   --it will count from end and goes till end
+substr(customer_name,-6) text3  ,   --it will start counting from end and goes till given value.
 substr(customer_name,3,6),
 instr(customer_name,' ') as char_index,     --it will give position of first occurance
 instr(customer_name,'C') as char_index,      --it will give position of first occurance
-concat(concat(order_id,'-'),customer_name),
+concat(concat(order_id,'-'),customer_name), --concat function takes only two arguments.
 order_id||'-'||customer_name,            --double bar, same as above
 substr(customer_name,1,instr(customer_name,' ')),    --it will print till where first space is occuring
 substr(customer_name,1,instr(customer_name,'e'))    --it will print till where first r is occuring
@@ -580,13 +634,15 @@ substr(customer_name,1,instr(customer_name,'e'))    --it will print till where f
 --substr(col,1,instr(col,' ')
 from orders;
 
---NVL replaces null values with argument
+--NVL replaces null values with specified argument
 select order_id, city, 
 nvl(city,'unknown'),      --in MSSQL its ISNULL
+--nvl(city, column1), we can also pass column as an argument if the value is null
 state,region,
 coalesce(city,'unknown'),      --in COALESCE function, we can pass more than one argument
 coalesce(city,state,region,'unknown') ,    --if city is null then state value, if state is null then region value, if region is also null then passing string argument
-coalesce(city,state,region),      
+coalesce(city,state,region),
+sales,
 nvl(sales,1),
 --nvl(sales,'AB')   ---error
 coalesce(sales,1)
@@ -598,14 +654,16 @@ where city is null;
 select order_id,sales, 
 cast(sales as int),   --converting float to int in query. --it also do round to the value
 round(sales),        --round to zero integer after decimal. --same as above
-round(sales,'1')     --round to one integer after decimal.
+round(sales,1),     --round to one integer after decimal.
+round(sales,2)
 from orders
 fetch first 5 rows only;
 
 
 --set queries
 --difference between JOIN and UNION or other set operators are Join will combine column of tables where as set operator will combine two or more tables
--- join combine columns from two tables; whereas, set operations will have same no. of columns of a single table but combined rows from two tables.
+
+--NOTE: join combine columns from two tables; whereas, set operations will have same no. of columns of a single table but combined rows from two tables.
 
 create table orders_west
 (
@@ -632,20 +690,20 @@ commit;
 
 select * from orders_west;
 select * from orders_east;
---whle performing union all, make sure that the number of columns and the dataype should be same for both the tables.
+--whle performing union or union all, make sure that the number of columns and the dataype should be same for both the tables.
 
 
 
---only union all will give u everything, intersect, minus, union will remove duplicates
+--only union all will give u everything but intersect, minus, union will remove duplicates
 select * from orders_west   --4rows, remove duplicates
 union
 select * from orders_east;
 
-select * from orders_west   --5rows, all rows with and without duplicates
+select * from orders_west   --5rows, all rows with duplicates
 union all
 select * from orders_east;
 
-select distinct * from orders_west   --5rows, all rows with and without duplicates
+select distinct * from orders_west   --5rows, all rows with duplicates
 union all
 select distinct * from orders_east;
 
@@ -654,9 +712,16 @@ intersect
 select * from orders_east;
 
 select * from orders_west   --orders_west - orders_east
-except      --except = minus
+except      --same as except = minus
 select * from orders_east;
 
+select *
+from orders_west w
+inner join orders_east e
+on (w.order_id=e.order_id);
+
+select *
+from orders_west,orders_east ;      --cross join
 
 --day 7 exercise
 
@@ -715,9 +780,6 @@ on d1.id = d2.id and d1.end_time=d2.start_time and d1.end_loc = d2.start_loc;
 group by id;
 
 
--- join combine columns from separate tables; whereas, set operations combine rows from separate tables.
---union all example
-
 --VIEW
 create view orders_vw as
 select * from orders where region = 'East';
@@ -734,10 +796,10 @@ emp_id int,
 name varchar2(10),
 dep_id int not null references dept(dep_id)     --foreign key constraint
 );
---since above table is dependent on dept table, therefore we cant update or delete dep_id record who is dependent iin emp table
+--since above table is dependent on dept table, therefore we cant update or delete dep_id record who is dependent in emp table
 insert into emp values (1,'aman',100);
 insert into emp values (2,'tushar',200);
---insert into emp values (1,'aman',500);  --ERROR, since its foreign key and 50 is not present in dept table.
+--insert into emp values (1,'aman',500);  --ERROR, since its foreign key and 50 is not present in dept table. ORA-02291: integrity constraint (SYSTEM.SYS_C0010783) violated - parent key not found
 
 select * from emp;
 select * from dept;
@@ -775,7 +837,7 @@ select * from orders where order_id = 'US-2019-134026';
 
 select * from dept;
 
---with subquery
+--using subquery
 select e.*,(select avg(salary) as avg_sal from employee) from employee e
 where dept_id not in (select dep_id from dept);
 
@@ -796,7 +858,7 @@ select team_2 as team_name,case when team_2=winner then 1 else 0 end from icc_wo
 )
 group by team_name;
 
---CTE common table expression
+--using CTE common table expression instead of above query.
 with A1 as
 (
 select team_1 as team_name,case when team_1=winner then 1 else 0 end as status from icc_world_cup
@@ -804,7 +866,7 @@ union all
 select team_2 as team_name,case when team_2=winner then 1 else 0 end from icc_world_cup
 )
 ,B1 as (select team_name  from A1)-- above CTE is referred here
---B1 will not be executed by DB because its not been called.
+--B1 will not be executed by DB because its not been called below.
 select team_name,count(*) as noofmatches,sum(status) as win,count(*)-sum(status) as loss
 from A1
 group by team_name;
@@ -876,7 +938,7 @@ select * from A1 where total_count > (select avg(total_count) from A1);
 select * from employee; 
 
 select * from employee
-order by dept_id, salary desc; -- it will do first dept_id asc and salary desc
+order by dept_id, salary desc; -- it will do first dept_id asc then salary desc
 
 --Q. rank from highest salary
 --in row_number() or rank() or dense_rank(), compulsory we have to use order by
@@ -887,13 +949,13 @@ from employee e;
 --creating window of dept_id
 select
 e.*,
-row_number() over( partition by dept_id order by salary desc) as rn
+row_number() over(partition by dept_id order by salary desc) as rn
 from employee e;
 
 --if there are duplicates   , since row_number gives unique number to each row whether its duplicate or not.
 select
 e.*,
-row_number() over( partition by dept_id order by salary desc, emp_id asc) as rn     -- it is useful in rank(), dense_rank()
+row_number() over(partition by dept_id order by salary desc, emp_id asc) as rn     -- it is useful in rank(), dense_rank()
 from employee e;                        --in order by, execution is from left to right
 
 
@@ -901,7 +963,7 @@ from employee e;                        --in order by, execution is from left to
 --since where clause runs before of select clause, we can't use where condition to get the output.
 select
 e.*,
-row_number() over( partition by dept_id order by salary desc, emp_id asc) as rn
+row_number() over(partition by dept_id order by salary desc, emp_id asc) as rn
 from employee e;
 --where rn <=2;     --error
 
@@ -910,38 +972,52 @@ select * from employee;
 select emp_id, emp_name, sum(salary) from employee group by emp_id, emp_name;
 
 --NOTE: Also, we cannot use HAVING without GROUP BY
---NOTE: by default aggregate function needs more than one value for max, min, avg, sum functions as the name suggest it need more than one value to compare i.e group by function is used.
+--NOTE: by default aggregate function needs more than one value for max, min, avg, sum functions as the name suggest it needs more than one value to compare i.e group by function is used.
 --Therefore, using subquery we can achieve it.
 select * from
 (select
 e.*,
-row_number() over( partition by dept_id order by salary desc, emp_id asc) as rn
-from employee e) where rn <=2;
- 
+row_number() over(partition by dept_id order by salary desc, emp_id asc) as rn
+from employee e) where rn <= 2;
+
+with A1 as (
+select 
+e.*,
+row_number() over(partition by dept_id order by salary desc) as rn
+from employee e
+)
+select * from A1
+where rn < 3;
+
 --Q. find top 2 ranks
 with A1 as
 (select
 e.*,
-row_number() over( partition by dept_id order by salary desc, emp_id asc) as rn
+row_number() over(partition by dept_id order by salary desc, emp_id asc) as rn
 from employee e)
 select * from A1 
 where rn <=2;
 
 --partition creates seperate cabin window
---chronology: partition by -> order by clause will work.
+--chronology: partition by -> order by, clause will work.
 --in SELECT query, the execution is from left to right
 select
-e.*
-, row_number() over(order by salary desc, emp_id asc) as rn    --passing emp_id to make to unique
+e.salary, e.emp_id, e.dept_id
+, row_number() over(order by salary desc, emp_id asc) as rn    --if valuesz of two rows are same then also row_number will give unique output.
 , row_number() over(order by salary desc) as rn2
 , rank() over(order by salary desc, emp_id asc) as rk
 , rank() over(order by salary desc) as rk2     -- it will skip next number
 , dense_rank() over(order by salary desc) as drk   -- it will not skip next number
-, row_number() over(partition by dept_id order by salary asc) as rn3   --it ill print number in desc
-, row_number() over(partition by dept_id order by salary desc) as rn3   --it ill print number in desc
-, row_number() over(partition by dept_id, salary order by salary asc) as rn3   --it ill print number in desc
-, rank() over(partition by dept_id, salary order by salary desc) as rn3 --all 1 because all are unique, and starting 2 rows are same therefore it will skip 2 for it.
-, dense_rank() over(partition by dept_id, salary order by salary desc) as rn3 --all 1 because all are unique and duplicate from 2nd row, and starting 2 rows are duplicate therefore it will skip 2 for it.
+from employee e;
+
+select 
+e.salary, e.emp_id, e.dept_id
+, row_number() over(partition by dept_id order by salary asc) as rn1   --it ill print number in desc
+, row_number() over(partition by dept_id order by salary desc) as rn2   --it ill print number in desc
+, row_number() over(partition by dept_id, salary order by salary asc) as rn3   --it ill print 1 for all bc it creates unique rows
+, rank() over(partition by dept_id, salary order by salary desc) as rk3 --all 1 because all are unique, and starting 2 rows are same therefore it will skip 2 for it.
+, dense_rank() over(partition by dept_id, salary order by salary desc) as dr1 --all 1 because all are unique and duplicate from 2nd row, and starting 3 rows are duplicate therefore it will skip 2 for it.
+, dense_rank() over(partition by dept_id, salary order by  emp_id  desc) as dr2
 from employee e;
 
 
@@ -962,30 +1038,34 @@ from A1 a
 select * from B1 
 where rank <= 5;
 
---if the question was to find top 5 salaires of employees then there is no need to aggregate first in below query
+--if the question was to find top 5 salaries of employees then there is no need to aggregate first in below query
 
 
 
 --LEAD and LAG windows function
 --it will print next value for lead and previous value for lag.
 --it needs one or two parameters
-select e.*,
-lead(salary,1) over(order by salary) as lead_sal  
+
+--eg. One of the example of lag is to get the previous month data in current row.
+select e.salary,
+lead(salary) over(order by salary) as ls
+,lead(salary,1) over(order by salary) as lead_sal  --same as above
 ,lead(salary,2) over(order by salary) as lead_sal  
 ,lag(salary,1) over(order by salary) as lag_sal  
 ,lag(salary,2) over(order by salary) as lag_sal  
+,lag(salary,3) over(order by salary) as ls
 from employee e;
 
-select e.*,
+select e.dept_id, e.salary,
 lead(salary,1) over(partition by dept_id order by salary) as lead_sal   --default value is assigned
 from employee e;
 
 --last row will be null since there is no next value but we can assign defalut value to it
-select e.*,
+select e.salary,
 lead(salary,1,salary) over(order by salary) as lead_sal --if there is null value then current salary as default value will be assigned
 from employee e;
 
-select e.*,
+select e.salary,e.dept_id,
 lead(salary,1,9999) over(partition by dept_id order by salary) as lead_sal   -- 9999 default value is assigned
 from employee e;
 
@@ -1017,10 +1097,10 @@ select e.*
 ,lag(salary) over(order by salary) as lag_lower_sal             -- by default its 1
 from employee e;
 
-
-select e.*,
-first_value(salary) over(order by salary desc) as first_sal,
-last_value(salary) over(order by salary desc) as last_sal   --it will print same value       -- it will consider unbounded preceeding and current value
+-- first_value, last_value
+select e.salary,
+first_value(salary) over(order by salary desc) as first_sal,    --it will consider crrent row and unbounded following.
+last_value(salary) over(order by salary desc) as last_sal   --it will print same value       -- it will consider unbounded preceeding and current value.
 from employee e;
 
 
@@ -1060,7 +1140,7 @@ where rn = 3 or (total_emp < 3 and rn = 1);--highest sal 1
 
 --first we have to do summation of sales then we have to generate rank on it   
 
---one with clause will  alwasy be for sum if sales question is asked
+--one With clause will always be for sum if sales question is asked
 with region_sales as (
 select region,product_id,sum(sales) as sales
 from orders
@@ -1190,43 +1270,108 @@ on a.dept_id = b.dept_id;
 
 --below query works same as above query
 --it doesn't matter to use order by in aggregate windows function
-select e.*
-,max(salary) over() as max_salary    --working as a subquery
+--NOTE: the main difference between normal aggregate function and aggregate windows function is that by using normal aggregate function we can get single value where as in aggregate windows function we get that value in all rows.
+--Aggregate means grouping of all rows and give single value.
+
+select e.dept_id,e.salary
 ,avg(salary) over() as avg_salary    --working as a subquery
 ,avg(salary) over(partition by dept_id) as avg_salary    --working as a subquery
-,min(salary) over(partition by dept_id) as min_salary    --working as a subquery
-,max(salary) over(partition by dept_id) as max_salary    --working as a subquery
-,count(salary) over(partition by dept_id) as count_of__salary    --working as a subquery
+,avg(salary) over(order by salary) as avg_sal           --unbounded preceding to current row
 from employee e;
 
---if we mention ORDER BY in aggregate function then it will do RUNNING operation
-select e.*,
-sum(salary) over(partition by dept_id) as sum_salary
-,avg(salary) over(partition by dept_id) as avg_salary    
-,sum(salary) over(partition by dept_id order by emp_age) as sum_sal_orderby --running sum : current value gets add up with next value in sum().
-,sum(salary) over(order by emp_age) as sum_sal_orderby
+select e.dept_id,e.salary
+,sum(salary) over() as sum
+--,sum(salary) over(partition by dept_id) as sum_sal_dept
+,sum(salary) over(order by salary) as sum_ord_sal   --calc sum of unbounded preceding till current row
 from employee e;
 
-select e.*
+
+select e.dept_id,e.salary
+,min(salary) over() as min
+--,min(salary) over(partition by dept_id) as min_salary    --working as a subquery
+,min(salary) over(order by salary) as min_ord_sal
+from employee e;
+
+select e.dept_id,e.salary
+,max(salary) over() as max
 --,max(salary) over(partition by dept_id) as max_salary    --working as a subquery
---,max(salary) over(partition by dept_id order by emp_age) as max_sal_orderby --RUNNING max
+,max(salary) over(order by salary) max_ord_sal      --max value from unboundded preceding to current row
+from employee e;
+
+select e.dept_id,e.salary
+,count(salary) over() as count
+--,count(salary) over(partition by dept_id) as count_of_salary    --working as a subquery
+,count(salary) over(order by salary) as count_ord_sal       --unbounded preceding to current row
+from employee e;
+
+--if we mention ORDER BY in aggregate function then it will do RUNNING operation means from unbounded preceding till current row
+select e.salary, e.dept_id, e.emp_age
+--,count(salary) over()
+--,count(salary) over(partition by dept_id) as count_salary
+,count(salary) over(order by emp_age) as count_byage   --running operation, 1,1+1=2,2+1=3,3+1=4,...... inshort it counts from unbounded preceding till current row
+,count(salary) over(order by dept_id) as count_orderbydept   --current vale = previous count + current count value
+from employee e;
+
+select e.salary, e.dept_id, e.emp_age
+,sum(salary) over(partition by dept_id) as sum_salary
+,avg(salary) over(partition by dept_id) as avg_salary    
+,sum(salary) over(partition by dept_id order by emp_age) as sum_sal_orderby --running sum : current value gets add up with previous value in sum().
+,sum(salary) over(order by emp_age) as sum_sal_orderby
+,max(salary) over(order by emp_age) as max_sal          --it gives max value from unbounded preceding till current row
+,max(salary) over(partition by dept_id order by emp_age) as max_sal_par
+from employee e; 
+
+select e.salary, e.dept_id, e.emp_age
+,max(salary) over(partition by dept_id) as max_salary    --working as a subquery
+,max(salary) over(partition by dept_id order by emp_age) as max_sal_orderby --RUNNING max
 ,max(salary) over(order by emp_age) as max_sal_orderby
+,sum(salary) over(partition by dept_id order by emp_age) as sum_sal
 ,max(salary) over(order by emp_age desc) as max_sal_orderby     --this query will run first then above query.
 from employee e;
 
 
-select e.* 
-,sum(salary) over(order by emp_id) as rolling_sum_salary
---below query will take rolling sum of preceding 2 rows
-,sum(salary) over(order by emp_id rows between 2 preceding and current row) as rolling_sum_salary
+select e.emp_id,e.dept_id,e.salary
+,sum(salary) over() as sum_sal  --sum of all values
+,sum(salary) over(order by emp_id) as rolling_sum_salary1    -- sum of unbounded preceding and current row
+--below query will take sum of preceding 2 rows with current row
+,sum(salary) over(order by emp_id rows between 2 preceding and current row) as rolling_sum_salary2
 --below query will sum 1 preceding and 1 following along with current row
-,sum(salary) over(order by emp_id rows between 1 preceding and 1 following) as rolling_sum_salary
-,sum(salary) over(partition by dept_id order by emp_id rows between 1 preceding and 1 following) as rolling_sum_salary
---below query will take sum of from its 5th row till 10th row
-,sum(salary) over(order by emp_id rows between 5 following and 10 following) as rolling_sum_salary
+,sum(salary) over(order by emp_id rows between 1 preceding and 1 following) as rolling_sum_salary3
+--below query will sum of 1 preceding, current row and 1 following and also within partition.
+,sum(salary) over(partition by dept_id order by emp_id rows between 1 preceding and 1 following) as rolling_sum_salary4
+--below query will take sum from its following 5th row till 10th row
+,sum(salary) over(order by emp_id rows between 5 following and 10 following) as rolling_sum_salary5
 from employee e;
 
 
+--practise
+select e.emp_id,e.dept_id,e.salary
+,sum(salary) over() as sum_sal
+,sum(salary) over(order by emp_id) as sum_sal1
+,sum(salary) over(order by emp_id rows between unbounded preceding and 3 following) as sum_sal2
+,sum(salary) over(partition by dept_id order by emp_id rows between 1 preceding and current row) as sum_sal3
+,first_value(salary) over(order by emp_id) as first_value
+,last_value(salary) over(order by emp_id) as last_value
+from employee e;
+
+
+
+
+------------------------------------------------------
+--all three statements are the same.
+select e.emp_id,e.dept_id,e.salary
+,sum(salary) over(order by emp_id rows between unbounded preceding and current row) as rolling_sum_unbound1
+,sum(salary) over(order by emp_id rows between unbounded preceding and 0 preceding) as rolling_sum_unbound2
+,sum(salary) over(order by emp_id) as roll_sum3  -- above two statements are the same as this current statement.
+from employee e;
+------------------------------------------------------
+--both below queries are same
+--below queries takes sum of all rows
+select e.emp_id,e.dept_id,e.salary
+,sum(salary) over() as sum_sal
+,sum(salary) over(order by emp_id rows between unbounded preceding and unbounded following) as rolsum
+from employee e;
+---------------------------------------------------------
 select e.* 
 --both the below queries will work and give same output
 ,sum(salary) over(order by emp_id) as rolling_sum_salary
@@ -1234,17 +1379,70 @@ select e.*
 
 --below query takes sum of all rows
 ,sum(salary) over(order by emp_id rows between unbounded preceding and unbounded following) as rolling_sum_salary
+from employee e;
 
---both below query wll work the same
+--both below query will work the same
+--no rolling sum bc there is no order by clause, and it will make sum within partition.
+select e.emp_id,e.dept_id,e.salary
 ,sum(salary) over(partition by dept_id) as rolling_sum_salary
 ,sum(salary) over(partition by dept_id order by emp_id rows between unbounded preceding and unbounded following) as rolling_sum_salary
 from employee e;
 
 
---practice
+--practise
+with A1 as
+(
+select *
+,count(category) over(order by product_id) as cnt
+from products
+)
+select product_id
+,first_value(category) over(partition by cnt) category
+,name
+from A1;
+
+--input
+product_id	category	name
+1	Shoes	Sperry Boat Shoe
+2	Adidas  Stan        Smith
+3	Vans    Authentic
+4	Jeans	   Levi 511
+5	Wrangler Straight Fit
+6	Shirts	Lacoste Classic Polo
+7	Nautica Linen Shirt
+
+--Output
+product_id	category	name
+1	Shoes	Sperry Boat Shoe
+2	Shoes	Adidas Stan Smith
+3	Shoes	Vans Authentic
+4	Jeans	Levi 511
+5	Jeans	Wrangler Straight Fit
+6	Shirts	Lacoste Classic Polo
+7	Shirts	Nautica Linen Shirt
+
+--2
+with A1 AS
+(
+select user_id, song_id, count(song_id) as song_plays
+from songs_weekly
+where listen_time <= to_date('04/08/23','dd/mm/yy')
+group by user_id, song_id
+
+union all
+
+select user_id, song_id, song_plays
+from songs_history
+)
+select user_id,song_id, sum(song_plays) as song_count
+from A1
+group by user_id, song_id
+order by song_count desc;
+
+
 select e.emp_id, e.emp_age,e.dept_id, e.salary
 ,sum(salary) over(partition by dept_id) as sum_partitionby  --sum of all in that particular partition
-,sum(salary) over(order by emp_age) as sum_orderby      -- running sum = one previous value of sum(salary) + current value of salary, like a triangle
+,sum(salary) over(order by emp_age) as sum_orderby      -- rolling sum
 ,sum(salary) over(partition by dept_id order by emp_age) as sum_partition_order
 ,sum(salary) over(order by emp_age rows between 2 preceding and current row) as preceding_currentrow -- running sum, --2 preceding of salary will addup to current salary value.
 ,sum(salary) over(order by emp_age rows between 1 preceding and 1 following) as preceding_following -- running sum, --1 preceding will addup to current row and 1 following values.
@@ -1261,16 +1459,17 @@ from employee e;
 
 
 select * from employee;
+--same first value or last value ill be printed in each row
 select e.*
 ,first_value(salary) over(order by salary) as first_sal_value
 ,first_value(salary) over(order by salary desc) as last_sal_value   --working as a last_value
---below query will consider from unbounded preceding to current row, therefore it tqkes curret row as last row and display the same value
+--below query will consider from unbounded preceding to current row, therefore it takes current row as last row and display the same value
 ,last_value(salary) over(order by salary) as last_sal_value   --working as a last_value
 ,last_value(salary) over(order by salary rows between current row and unbounded following) as last_sal_value   --working as a last_value    --15000
 ,last_value(salary) over(order by salary desc rows between current row and unbounded following) as last_sal_value   --working as a last_value   --5000
 from employee e;
 
---NOTE: for aggregate function its always rows between unbounded preceding and current row
+--NOTE: for aggregate windows function its always rows between unbounded preceding and current row
 
 
 select row_id from orders;
@@ -1441,7 +1640,7 @@ from orders o
 ) A1
 pivot
 (
-sum(sales)      --alias should not be mentioned, else it will throw error.
+sum(sales)      --alias should NOT be mentioned, else it will throw error.
 for year in (2020,2021)
 )B1;
 
@@ -1502,7 +1701,9 @@ group by o.category;
 --same as above query
 select * from
 (
-select o.category, extract(year from o.order_date) as yod, o.sales
+select 
+o.category,     -- groupby is applied internally
+extract(year from o.order_date) as yod, o.sales
 from orders o
 ) t1
 pivot 
@@ -1586,7 +1787,7 @@ select * from employee e
 where exists (select 1 from dept d where e.dept_id=d.dep_id);
 
 --the outer query wll run for each row inner query and fetch the output
-in IN opertor, inner query is run only single time but in EXISTS the inner query will run for each row of outer query.
+--in IN opertor, inner query is run only single time but in EXISTS the inner query will run for each row of outer query.
 --it is similar to IN
 
 --opposite of exists
@@ -1660,7 +1861,7 @@ select * from dba_indexes where lower(table_name)='emp_index';
 --NOTE: When you use index then your inserts will be slow
 --to skip the slowness, we can drop the index and create again for every insert.
 --Unique index will be little bit faster than non unique index since the value will not be duplicate in unique index so the index will search for only single time.
---press F10 on query to know explain pla, cost of execution with index
+--press F10 on query to know explain plan, cost of execution with index
 
 --Q. How to delete duplicates
 create table emp_dup
@@ -1767,7 +1968,7 @@ dept d
 on e.dept_id = d.dep_id;
 
 --full outer join
---it is the combination of both left and right oter join.
+--it is the combination of both left and right outer join.
 --if the columns are not matchinfg then null values will be there.
 select *
 from employee e
@@ -1855,7 +2056,6 @@ on (i.city=a.city);
  
  
 --6- write a query to find percentage contribution of spends by females for each expense type
-
 select * from credit_card_transactions;
 
 
