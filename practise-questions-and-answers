@@ -1,0 +1,144 @@
+1. Employees Earning More Than Their Managers.
+Answer:
+select e1.name as Employee
+from employee e1
+inner join employee e2
+on e1.managerid = e2.id
+where e1.salary > e2.salary;
+
+2. Second Highest Salary, if there is no value then print null.
+Answer:
+select max(salary) as SecondHighestSalary
+from (
+select e1.*, dense_rank() over(order by e1.salary desc) as rnk
+from employee e1
+) where rnk = 2;
+
+3. Find the employee with second highest salary from each department, if there is no value then print null.
+Answer:
+select max(salary) as SecondHighestSalary
+from (
+select e1.*, dense_rank() over(partition by id order by e1.salary desc) as rnk
+from employee e1
+) where rnk = 2;
+
+4. Find customers who are not present in the orders table.
+Answer:
+SELECT first_name, age
+FROM Customers c
+left join orders o
+on c.customer_id = o.customer_id
+where o.customer_id is null;
+
+5. find the change in employee status from 2020 to 2021 -> Example of full outer join.
+Answer:
+SELECT e20.*, e21.*,
+CASE
+WHEN e20.designation IS DISTINCT FROM e21.designation THEN 'Promoted'
+WHEN e21.designation IS NULL THEN 'Resigned'
+ELSE 'New'
+END AS comment
+FROM emp_2020 e20
+FULL OUTER JOIN emp_2021 e21 ON e20.emp_id = e21.emp_id
+WHERE COALESCE(e20.designation,'XXX') != COALESCE(e21.designation,'YYY');
+
+6. Rank the duplicate records.
+Answer:
+
+7. Identify and delete exact duplicate record.
+Answer:
+create table employee2 as select * from employee where 1 = 2;
+insert into employee2 (
+select * from (
+select *, row_number() over(partition by id order by salary) rn from employee
+) where rn = 1
+);
+
+8. Find no of goldmedal per swimmer for swimmers who only won gold medals.
+select id, count(medal) as no_of_gold 
+from athletes 
+where game = "swimming" and medal = "gold"
+group by id
+order by no_of_gold desc;
+
+9. find the total no of people present inside the hospital
+Answer:
+select * from
+(
+select id,
+max(case when action = 'in' then time end) as intime,
+max(case when action = 'out' then time end) as outitme
+from hospital
+group by id
+)
+where intime > outtime or outtime is null;
+
+10. return all employees whose salary is same in each department.
+with A1 as (
+select dept_id,salary
+from employee
+group by dept_id, salary
+having count(1) > 1
+)
+select e.* from A1 a inner join employee e on a.id = e.id and a.salary = e.salary;
+
+11. write the query to find the highest and lowest salary employee in each department.
+Answer:
+with A1 as (
+select d_name, e_name
+dense_rank() over(partition by d_name order by salary desc) as max_rnk,
+dense_rank() over(partition by d_name order by salary) as min_rnk
+from employee e
+inner join department d
+on e.d_id = d.d_id
+)
+select d_name,
+max(case when max_rnk = 1 then e_name end) as max_sal_name,
+max(case when min_rnk = 1 then e_name end) as min_sal_name
+from A1
+group by d_name
+;
+
+12. find the names which are not common in both source and target table.
+Answer:
+select coalesce(s.id,t.id) as id,
+case when t.id is null then 'new in source'
+when s.id is null then 'new in target' 
+--else 'mismatched' 
+end as comment
+from source s
+full outer join
+target t
+on s.id = t.id
+where s.id is null or t.id is null or s.id != t.id
+;
+
+13. find the count of new customer in each month.
+Answer:
+select order_date, count(distinct c_id) as count
+from
+(
+select *,
+rank() over(partition by c_id order by order_date) as rnk
+from customers
+) 
+group by order_date
+having max(rnk)=1
+;
+
+14. find the father's name and mother's name of every child.
+Answer:
+
+
+
+
+
+
+
+
+
+
+
+
+
+

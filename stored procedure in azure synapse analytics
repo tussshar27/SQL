@@ -1,0 +1,28 @@
+stored-procedure in azure synapse
+Steps:
+1. First Create a stored procedure inside MS SQL. having three parameters: FileName, ModifiedDate, RecordInsertDate and having insert statement with all the three parameter columns inserting into a table.
+2. Create a linked service for "Azure SQL Database" in azure.
+3. create a pipeline inside azure synapse analytics:
+4. import Get Metadata activity, working: it will go to the folder inside ADLS and return the childitem of file name and type of file inside it.
+childitems: [{'name','type'}, {'name','type'},..]
+5. import "For Each" Activity: get the details from "get metadata" activity in loop of iteration for individual file. {'name','type'}.
+6. connect "get metadata" acitivity to "for each" activity via success connector.
+7. click on Edit of "For Each" activity and inside that import "get metadata" activity to return the metadata from ADLS of each file name taken from the outer pipeline "For Each" activity.
+8. inside settings of "get metadata" activity, select dataset or create one related to ADLS.
+9. import "stored procedure" activity.
+10. connect both "get metadata" and "stored procedure" activity with success connector inside the "For Each" activity.
+11. click on "stored procedure" and go to its settings
+12. Select linked service and our stored procedure name which is present in MS SQL.
+13. click on "Import" of parameters to  import all the parameters from the stores procedure available in MS SQL.
+14. FileName, ModifiedDate, RecordInsertDate are the three parameters present inside stored procedure of MS SQL.
+15. click on value of FileName > Add dynamic content
+16. select "current item" > @item().name
+17. click on value of ModifiedDate > Add dynamic content
+18. select "functions" > Date functions > utcnow (it will return current date time).
+19. click on value of RecordInsertDate > Add dynamic content
+20. select "functions" > Date functions > utcnow (it will return current date time).
+21. come to outer pipeline > click on debug.
+22. do select query on the table in which insert is happening inside the stored procedure, and we can see rows are inserted in it with the FileName, ModifiedDate, RecordInsertDate.
+23. publish the ppipeline.
+
+The main advantage of Debug is we can still make changes to the pipeline since we haven't published it.

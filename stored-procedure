@@ -1,0 +1,38 @@
+A stored procedure is a group of SQL statements that are stored in a database.
+Example:
+CREATE PROCEDURE TEST1
+AS
+SELECT *
+FROM TABLE1
+
+Execute the above code to create TEST1 procedure.
+
+To run the stored procedure:
+Example:
+EXEC TEST1
+
+Example2:
+CREATE PROCEDURE TEST2
+AS
+CREATE TABLE2(
+ID NUMBER(10),
+NAME VARCHAR2(20),
+ADDRESS VARCHAR2(40)
+)
+INSERT INTO TABLE2 (1,"ABC","GOA");
+INSERT INTO TABLE2 (2,"PQR","MUMBAI");
+INSERT INTO TABLE2 (3,"MNO","DAMAN");
+
+SELECT * 
+FROM TABLE2
+
+Execute the above code to create TEST2 procedure.
+
+To run the stored procedure
+EXEC TEST2
+
+
+
+
+
+
