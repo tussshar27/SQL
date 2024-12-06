@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 -- to change password of database
 --// For seeing full user details
 SELECT * FROM dba_users WHERE username = 'SYSTEM';
@@ -17,9 +16,7 @@ alter user your_username identified by your_password;
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------
-=======
 -- SQL Order of Execution: From > where > group by > having > select > distinct > order by > limit
->>>>>>> 54df154fc100976e456de4b1a85a2c48a70d81f8
 
 --schema is like a folder where as database is like a drive eg. C drive in windows. we can create multiple schemas in a single database.
 select * from dba_pdbs; -- to show all the pluggable dbs
