@@ -2,6 +2,8 @@
 
 --video 1
 --Q. find win and loss teams
+--NOTE: first we have to calculate wins of teams then we can get the total count and losses.
+
 SELECT * FROM icc_world_cup;
 
 with A1 as(
