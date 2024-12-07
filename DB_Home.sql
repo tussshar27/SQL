@@ -20,8 +20,28 @@ alter user your_username identified by your_password;
 
 --schema is like a folder where as database is like a drive eg. C drive in windows. we can create multiple schemas in a single database.
 
--- regexp in oracle:
+-- delete duplicates from table
+--in MSSQL:
+--CTEs are read only operation so we cant perform direct delete on it
+--error below:
+with A1 as (
+select *, row_number() over(partition by column1, column2,column3 order by id) as rn from table1
+)
+delete from A1 where rn > 1;
 
+--correct version:
+with A1 as (
+	select *, row_number() over(partition by column1, column2, column3 order by id) as rnk from table1
+	)
+	delete from table1 where id in (select id from A1 where rbk > 1);
+
+--in Oracle:
+--using above row_number() method or by rowid (available in oracle, MySQL)
+delete from table1 t1 where rowid > (select min(rowid) from table1 t2 where t1.column1=t2.column1 and t1.column2=t2.column2); 
+
+
+
+-- regexp in oracle:
 -- Write a solution to find the users who have valid emails.
 -- A valid e-mail has a prefix name and a domain where:
 -- The prefix name is a string that may contain letters (upper or lower case), digits, underscore '_', period '.', and/or dash '-'. The prefix name must start with a letter.
