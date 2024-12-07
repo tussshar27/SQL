@@ -16,45 +16,38 @@ group by team_name;
 
 --video 2
 --Q. find new and repeat customers count
-create table customer_ordersinsert into users values(
+create table customer_orders (
 order_id integer,
 customer_id integer,
 order_date date,
 order_amount integer
-,'yyyy-mm-dd');
-insert into customer_orders values(1,100,to_date('2022-01-01','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),2000,'yyyy-mm-dd');;
-insert into customer_orders values(2,200,to_date('2022-01-01','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),2500,'yyyy-mm-dd');;
-insert into customer_orders values(3,300,to_date('2022-01-01','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),2100,'yyyy-mm-dd');;
-insert into customer_orders values(4,100,to_date('2022-01-02','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),2000,'yyyy-mm-dd');;
-insert into customer_orders values(5,400,to_date('2022-01-02','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),2200,'yyyy-mm-dd');;
-insert into customer_orders values(6,500,to_date('2022-01-02','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),2700,'yyyy-mm-dd');;
-insert into customer_orders values(7,100,to_date('2022-01-03','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),3000,'yyyy-mm-dd');;
-insert into customer_orders values(8,400,to_date('2022-01-03','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),1000,'yyyy-mm-dd');;
-insert into customer_orders values(9,600,to_date('2022-01-03','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('yyyy-mm-dd'),3000,'yyyy-mm-dd');;
-commit;
-SELECT * FROM customer_orders;
+);
+insert into customer_orders values
+ (1,100,cast('2022-01-01' as date),2000)
+,(2,200,cast('2022-01-01' as date),2500)
+,(3,300,cast('2022-01-01' as date),2100)
+,(4,100,cast('2022-01-02' as date),2000)
+,(5,400,cast('2022-01-02' as date),2200)
+,(6,500,cast('2022-01-02' as date),2700)
+,(7,100,cast('2022-01-03' as date),3000)
+,(8,400,cast('2022-01-03' as date),1000)
+,(9,600,cast('2022-01-03' as date),3000)
+;
+select * from customer_orders;
 
 --first find the min order date for each customerid then we can compare it to get the solution.
 --NOTE: whenever aggregate solution is asked then it needs a AGGREGATE CASE statement in it.
-with A1 asinsert into users values(
-SELECT 
-customer_id, min(order_date) min_order_date
-FROM customer_orders 
-group by customer_id
+with A1 as (
+select customer_id, min(order_date) as min_order_date from customer_orders group by customer_id
 )
-, B1 asinsert into users values(
-select co.*, a.min_order_date 
-from customer_orders co 
-inner join A1 a 
-on a.customer_id=co.customer_id
+, B1 as (
+select * from customer_orders
 )
-select order_date
-,sum(case when order_date=min_order_date then 1 else 0 end) as new_customer
-,sum(case when order_date!=min_order_date then 1 else 0 end) as old_customer
-,sum(case when order_date=min_order_date then order_amount end) as order_amount_of_new_cust
-,sum(case when order_date!=min_order_date then order_amount end) as order_amount_of_old_cust
-from B1 
-group by order_date;
+, C1 as (
+select B1.* , A1.min_order_date from A1 inner join B1 on A1.customer_id=B1.customer_id
+)
+select order_date, sum(case when order_date=min_order_date then 1 else 0 end) as new_customer_count,
+sum(case when order_date<>min_order_date then 1 else 0 end) as old_customer_count from C1 group by order_date;
 
 --video 3
 --Q. find the most number of floor visits
