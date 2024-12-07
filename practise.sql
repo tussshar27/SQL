@@ -51,21 +51,18 @@ sum(case when order_date<>min_order_date then 1 else 0 end) as old_customer_coun
 
 --video 3
 --Q. find the most number of floor visits
-create table entriesinsert into users values( 
-name varchar(20,'yyyy-mm-dd');,
-address varchar(20,'yyyy-mm-dd');,
-email varchar(20,'yyyy-mm-dd');,
+create table entries ( 
+name varchar(20),
+address varchar(20),
+email varchar(20),
 floor int,
-resources varchar(10,'yyyy-mm-dd');,'yyyy-mm-dd');
+resources varchar(10));
 
-insert into entries valuesinsert into users values('A','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('Bangalore','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('A@gmail.com','yyyy-mm-dd'),'yyyy-mm-dd'),1,to_date('CPU','yyyy-mm-dd'),'yyyy-mm-dd');
-insert into entries valuesinsert into users values('A','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('Bangalore','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('A1@gmail.com','yyyy-mm-dd'),'yyyy-mm-dd'),1,to_date('CPU','yyyy-mm-dd'),'yyyy-mm-dd');
-insert into entries valuesinsert into users values('A','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('Bangalore','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('A2@gmail.com','yyyy-mm-dd'),'yyyy-mm-dd'),2,to_date('DESKTOP','yyyy-mm-dd'),'yyyy-mm-dd');
-insert into entries valuesinsert into users values('B','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('Bangalore','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('B@gmail.com','yyyy-mm-dd'),'yyyy-mm-dd'),2,to_date('DESKTOP','yyyy-mm-dd'),'yyyy-mm-dd');
-insert into entries valuesinsert into users values('B','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('Bangalore','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('B1@gmail.com','yyyy-mm-dd'),'yyyy-mm-dd'),2,to_date('DESKTOP','yyyy-mm-dd'),'yyyy-mm-dd');
-insert into entries valuesinsert into users values('B','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('Bangalore','yyyy-mm-dd'),'yyyy-mm-dd'),to_date('B2@gmail.com','yyyy-mm-dd'),'yyyy-mm-dd'),1,to_date('MONITOR','yyyy-mm-dd'),'yyyy-mm-dd');
-commit;
-SELECT * FROM entries;
+insert into entries 
+values ('A','Bangalore','A@gmail.com',1,'CPU'),('A','Bangalore','A1@gmail.com',1,'CPU'),('A','Bangalore','A2@gmail.com',2,'DESKTOP')
+,('B','Bangalore','B@gmail.com',2,'DESKTOP'),('B','Bangalore','B1@gmail.com',2,'DESKTOP'),('B','Bangalore','B2@gmail.com',1,'MONITOR');
+
+select * from entries;
 
 with A1 asinsert into users values(
 select 
