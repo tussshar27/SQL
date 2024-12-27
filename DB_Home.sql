@@ -115,7 +115,19 @@ insert into employees values (5,'Jane',7598632545,'26-04-2023 06:07:26 AM');
 
 SELECT * FROM orders;
 
+--Recursive cte
+recursive cte
+--cte call itself and it will run till the breakpoint
+with A1 as (
+select 1 as num	--anchor query (run at first and only for one time)
 
+union all
+
+select num+1	--recursive query
+from A1 
+where num < 6	--filter to stop the recursion
+)
+select num from A1;
 
 -- Constraints
 --1. default constraint
