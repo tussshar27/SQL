@@ -128,7 +128,14 @@ from A1
 where num < 6	--filter to stop the recursion
 )
 select num from A1;
-
+output:
+1
+2
+3
+4
+5
+6
+	
 -- Constraints
 --1. default constraint
 --2. check constraint, it is used to restrict data to specific values while inserting.
