@@ -1,3 +1,11 @@
+A recursive CTE:
+Starts from one row
+Then moves to the next row
+Remembers previous row’s value
+Compares current vs previous
+Repeats until table ends
+
+
 WITH RECURSIVE emp_hierarchy AS (
     -- Anchor query (top-level employee)
     SELECT 
