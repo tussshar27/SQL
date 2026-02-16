@@ -87,7 +87,7 @@ OR
     -- Alphabetic match
     t1.segment_code_int IS NULL
     AND t2.segment_code_int IS NULL
-    AND t1.segment_code = t2.segment_code
+    AND t1.segment_code = t2.segment_code #NOTE: these columns are different than the above mentioned columns
 );
 
 
