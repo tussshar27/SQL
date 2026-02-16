@@ -57,6 +57,40 @@ from users
 where regexp_like(mail,'^[a-zA-Z][a-zA-Z0-9._-]*@leetcode[.]com$');
 -- o/p: sally.come@leetcode.com
 
+-- TRY_CAST()
+When we have numbers and alphabets in a common column and we are performing join in it then internally spark will try to convert values in integer so to consider even alphabets then we will use try_cast(col) but there is a catch, try_cast() will convert string values to Null so to even join respective string values use below code:
+
+code:
+WITH t1 AS (
+    SELECT *,
+           TRY_CAST(segment_code AS INT) AS segment_code_int
+    FROM table1
+),
+t2 AS (
+    SELECT *,
+           TRY_CAST(segment_code AS INT) AS segment_code_int
+    FROM table2
+)
+
+SELECT *
+FROM t1
+JOIN t2
+ON
+(
+    -- Numeric match
+    t1.segment_code_int IS NOT NULL
+    AND t2.segment_code_int IS NOT NULL
+    AND t1.segment_code_int = t2.segment_code_int
+)
+OR
+(
+    -- Alphabetic match
+    t1.segment_code_int IS NULL
+    AND t2.segment_code_int IS NULL
+    AND t1.segment_code = t2.segment_code
+);
+
+
 --DDL > Data Defnition Language
 /*
 create table employees(
