@@ -7,7 +7,41 @@ Repeats until table ends.
 
 Read row 1 → go to row 2 → go to row 3 → …
 
+
+There are three parts in recursive CTE:
+1. base query
+2. recursive query
+3. termination check
+
+
+Syntax:
+with RECURSIVE cte_name as (
+    base/anchor query                  -- non recursive term
+    union all
+    recursive query                    -- recursive term
+)
+select * from cte_name
+;
+
 #Eg 1:
+with RECURSIVE A1 as (
+    select 1 as n
+    
+    union all
+    
+    select n + 1 from A1
+    where n < 3  
+)
+select * from A1
+;
+
+#output:
+1
+2
+3
+
+-------------------------------------------------------------------------
+#Eg 2:
 WITH RECURSIVE emp_hierarchy AS (
     -- Anchor query (top-level employee)
     SELECT 
@@ -50,40 +84,7 @@ to find: We want to find rows where the same value appears in consecutive rows
 
 
 
-
--------------------------------------------------------------------------
-There are three parts in recursive CTE:
-1. base query
-2. recursive query
-3. termination check
-
-
-Syntax:
-with RECURSIVE cte_name as (
-    base/anchor query                  -- non recursive term
-    union all
-    recursive query                    -- recursive term
-)
-select * from cte_name
-;
-
-example:
-with RECURSIVE A1 as (
-    select 1 as n
-    
-    union all
-    
-    select n + 1 from A1
-    where n < 3  
-)
-select * from A1
-;
-
-#output:
-1
-2
-3
-
+-------------------------------------------------------------------------------------------------
 USE CASE:
 1. count of numbers
 2. finding hierarchical level of all employees
