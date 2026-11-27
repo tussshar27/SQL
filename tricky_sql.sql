@@ -28,3 +28,15 @@ FROM (
     FROM employees
 ) t
 WHERE cnt > 1;
+
+4. remove duplicate records 
+WITH cte AS (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY name
+               ORDER BY employee_id
+           ) AS rn
+    FROM employees
+)
+DELETE FROM cte
+WHERE rn > 1;
