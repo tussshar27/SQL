@@ -248,6 +248,16 @@ SELECT * FROM e_orders where prod_name > 'mask';    -- filter is done based on A
 
 SELECT * FROM orders;
 
+
+-- FILTER on Joins
+-- UNDERSTANDING: if we are performing left join and we want to apply filter on right table then mention that filter in on condition instead of where clause else it will skip rows
+select * from customers c left join orders o on o.orderid=c.orderid and o.amount > 500;
+-- if we apply amount filterusing where clause then it will skip null values of left table which is unexpected 
+select * from customers c left join orders o on c.orderid=o.orderid where o.amount > 500;
+
+
+
+
 --LIKE operator
 --WILDCARD characters
 SELECT * FROM orders;
