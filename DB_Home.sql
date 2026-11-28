@@ -56,7 +56,9 @@ SELECT * FROM EMPLOYEE E INNER JOIN DEPARTMENT D ON E.DEPTID = D.DEPTID
 -- gives FALSE if atleast one record is given by the subquery 
 find employees whose department do not exist in department table
 select * from employee e where NOT EXISTS (select 1 from department d where e.deptid = d.deptid)
--- ALTERNATIVE:
+-- ALTERNATIVE 1:
+SELECT * FROM EMPLOYEE WHERE DEPTID NOT IN (SELECT DEPTID FROM DEPARTMENT)
+-- ALTERNATIVE 2:
 SELECT * FROM EMPLOYEE E LEFT JOIN DEPARTMENT D ON E.DEPTID = D.DEPTID WHERE D.DEPTID IS NULL
 
 
