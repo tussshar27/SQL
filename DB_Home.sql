@@ -1892,12 +1892,25 @@ commit;
 
 select * from emp_index where emp_id=3 and salary=3000;
 
+OR
+
+-- Clustered index
+CREATE CLUSTERED INDEX idx_emp_id
+ON Employee(Emp_ID);
+
+-- Non-clustered index
+CREATE NONCLUSTERED INDEX idx_emp_name
+ON Employee(Name);
+
+-- Another non-clustered index
+CREATE NONCLUSTERED INDEX idx_department
+ON Employee(Department);
 --NORMAL index ( non clustered index) --we can create non clustered index on multiple columns
 create index idx_emp_name_salary on emp_index(emp_name,salary);
 --drop index idx_emp_name_salary;
 select * from dba_indexes where lower(table_name)='emp_index';
 
---NOTE: When you use index then your inserts will be slow
+--NOTE: When you use index then your inserts, updates and deletes will be slower that's why index is not created on each and every column of a table.
 --to skip the slowness, we can drop the index and create again for every insert.
 --Unique index will be little bit faster than non unique index since the value will not be duplicate in unique index so the index will search for only single time.
 --press F10 on query to know explain pla, cost of execution with index
