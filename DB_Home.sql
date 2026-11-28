@@ -253,6 +253,7 @@ SELECT * FROM orders;
 -- UNDERSTANDING: if we are performing left join and we want to apply filter on right table then mention that filter in on condition instead of where clause else it will skip rows
 select * from customers c left join orders o on o.orderid=c.orderid and o.amount > 500;
 -- if we apply amount filter using where clause then it will first perform left join and retain all the values from left table then on top of it apply where filter because of which all the null values will be removed and only filtered data will be shown
+-- in short, it filters the final dataset
 select * from customers c left join orders o on c.orderid=o.orderid where o.amount > 500;
 
 
@@ -466,6 +467,11 @@ from employee e
 left join dept d on e.dept_id = d.dep_id    --order of execution : (Top-Bottom Approach) left join -> inner join
 inner join people p on p.region = e.region;     --we can join people table with any one of previous tables.
 --we can join n number of tables together.
+
+-- some db don't support full outer join so in that case use 'left join -> union -> right join'
+select * from employee e left join department d on e.deptid=d.deptid
+union
+select * from employee e right join department d on e.deptid=d.deptid;
 
 
 --day 5 exercise
