@@ -40,6 +40,31 @@ with A1 as (
 delete from table1 t1 where rowid > (select min(rowid) from table1 t2 where t1.column1=t2.column1 and t1.column2=t2.column2); 
 
 
+-- EXISTS in sql 
+-- gives TRUE if atleast one record exists in a subquery 
+-- gives FALSE if no record exists in a subquery
+-- UNDERSTANDING: where condition is given because exists is declared without any specific column
+find employees whose department exists in department table 
+select * from employee e where exists ( select 1 from department d where d.deptid = e.deptid )
+-- ALTERNATIVE 1:
+SELECT * FROM EMPLOYEE WHERE DEPTID IN (SELECT DEPTID FROM DEPARTMENT)
+-- ALTERNATIVE 2:
+SELECT * FROM EMPLOYEE E INNER JOIN DEPARTMENT D ON E.DEPTID = D.DEPTID
+
+-- NOT EXISTS in sql 
+-- gives TRUE if no record is given by the subquery
+-- gives FALSE if atleast one record is given by the subquery 
+find employees whose department do not exist in department table
+select * from employee e where NOT EXISTS (select 1 from department d where e.deptid = d.deptid)
+-- ALTERNATIVE:
+SELECT * FROM EMPLOYEE E LEFT JOIN DEPARTMENT D ON E.DEPTID = D.DEPTID WHERE D.DEPTID IS NULL
+
+
+
+
+
+
+
 
 -- regexp in oracle:
 -- Write a solution to find the users who have valid emails.
