@@ -250,8 +250,9 @@ SELECT * FROM orders;
 
 
 -- FILTER on Joins
--- UNDERSTANDING: if we are performing left join and we want to apply filter on right table then mention that filter in on condition instead of where clause else it will skip rows
-select * from customers c left join orders o on o.orderid=c.orderid and o.amount > 500;
+-- UNDERSTANDING: if we are performing left join and we want to apply filter on right table then mention that filter in on condition instead of where clause else it will skip rows and if we want to apply filter on left table and we are performing left join then mention that filter condition using where clause.
+-- because we apply filter on right table using ON.
+select * from customers c left join orders o on o.orderid=c.orderid and o.amount > 500 where c.customer_name='tushar';
 -- if we apply amount filter using where clause then it will first perform left join and retain all the values from left table then on top of it apply where filter because of which all the null values will be removed and only filtered data will be shown
 -- in short, it filters the final dataset
 select * from customers c left join orders o on c.orderid=o.orderid where o.amount > 500;
